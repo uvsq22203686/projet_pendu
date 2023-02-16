@@ -1,0 +1,21 @@
+1) Code:
+ - trouver une liste de mots  
+ - générer des mots
+ - creations des indications simples
+ - créations des indication complexes (enigmes,...)
+ - base de données qui sauvegarde le score et d'autres données
+ 
+ 2) Interface:
+ - interface commun, menu déroulants, bouttons (score, aide,...)
+ - interface score, aide,...
+ - pendu + son animation
+ - mot masqué/démasqué
+ - pop up perdu/gagné + lancer une nouvelle partie
+ - effets graphiques
+ - pendu parlant
+ 
+3) En +:
+ - jouer à 2+ joueurs
+ 
+ 
+ 
