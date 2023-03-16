@@ -202,7 +202,7 @@ def create_bouton_ask_eni(mot):
     ask_eni_bouton1["menu"] =  ask_eni_bouton1.menu
 
     ask_eni_bouton1.menu.add_command(label = 'Homonyme', command = lambda : choisir_sous_action('homonymes'))
-    ask_eni_bouton1.menu.add_command(label = 'Cytation',  command = lambda : choisir_sous_action('citations'))
+    ask_eni_bouton1.menu.add_command(label = 'Citation',  command = lambda : choisir_sous_action('citations'))
     ask_eni_bouton1.menu.add_command(label = 'Locution', command = lambda : choisir_sous_action('locutions'))
     ask_eni_bouton1.menu.add_command(label = 'Tout', command = lambda : choisir_sous_action(None))
 
