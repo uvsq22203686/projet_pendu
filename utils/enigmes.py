@@ -86,7 +86,8 @@ def make_request(mot, action, sous_action = None):
     of a word or a complement information'''
 
     url = 'https://www.larousse.fr/dictionnaires/francais/' + mot
-    response = requests.get(url)
+    #attention timeout 
+    response = requests.get(url, timeout = 15)
 
     try:
         if response.status_code == 200:
@@ -125,7 +126,7 @@ def make_request(mot, action, sous_action = None):
                     
 
         else:
-            return ['Verifiez la connection internet.\n Status code:'+ response.status_code, 'error']
+            return ['Errer! Status code:'+ response.status_code, 'error']
 
     except TimeoutError:
         return ['Verifiez la connection internet.\n Status code:'+ response.status_code, 'error']
