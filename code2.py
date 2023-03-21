@@ -3,18 +3,18 @@ import PIL as pil
 import tkinter.font as font
 from PIL import Image
 from PIL import ImageTk 
+from tkinter import StringVar
 from tkinter import filedialog
 from tkinter import simpledialog
-from PIL import ImageTk
 from tkinter import messagebox
 import numpy as np 
- 
+
 
 
 gagneperd = 0 # variable a laquelle on ajoute +1 ou -1 a chaque fois que le joueur perd ou gagne
 
 def fontionrecommencer() :
-    L=tk.Label(racine, text="Remplacer cette fontion par la fontion qui recommence", bg="red")
+    L=tk.Label(racine, text="Remplacer cette fontion par la fonction qui recommence", bg="red")
     L.place(x=10, y=0)
 
 if gagneperd >= 1 :
@@ -34,7 +34,7 @@ if gagneperd >= 1 :
     police = font.Font(size = 50)
     gagne['font'] = police
 #boutons
-    restart2 = tk.Button(text="Recommancer une partie à 2 joueurs ", command = fontionrecommencer)#mettre le code en comman
+    restart2 = tk.Button(text="Recommencer une partie à 2 joueurs ", command = fontionrecommencer)#mettre le code en comman
     restart2.place(x=300, y = 320)
     restart1 = tk.Button(text="Recommencer une partie à 1 joueur", command = fontionrecommencer) 
     restart1.place(x=310, y = 400)
@@ -84,7 +84,7 @@ else :
     racine.mainloop()
 
 
-# fontion qui permettent d'afficher les indication par rapports aux emplacements des widgets 
+# fonctions qui permettent d'afficher les indications par rapport aux emplacements des widgets 
 def aide() :
     l = tk.Label(racine, text = "← clique ici pour avoir un indice sur le mot secret")
     l.place(x=500, y=0)
@@ -104,17 +104,29 @@ b2.place(x=400, y=0)
 racine.mainloop()
 
 
-#fontion qui permet de donner un indice sur une lettre du mot secret 
+#fonction qui permet de donner un indice sur une lettre du mot secret 
 def indiceslettres(event) :
     if event.widget == indices :
         vraifonction()
 
+
 def vraifonction(mot, mask) :
+    MotVar = StringVar(value = mot)
+
     for i in range(len(mot)):
         #changer la prise en prise 
         if mask[i]== "non prise" :
             j= "La", i+1, "eme lettre est", mot[i]
-            v = tk.Label(text =j)
+        
+    v = tk.Label(textvariable = MotVar)
+    hidden_word = "*" * len(mot)
+
+    for k in range(len(mot)):
+
+        if mot[k]==input_letter:                     #input_letter -> fonction à revoir lors du dev de l'entrée utilisateur
+            hidden_word = hidden_word[:k] + input_letter + hidden_word[k+1:]
+            MotVar.set(value=hidden_word)
+            
 #demander a jules pour completer la fontion 
 
 
