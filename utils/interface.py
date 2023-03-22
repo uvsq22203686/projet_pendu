@@ -13,6 +13,7 @@ from tkVideoPlayer import TkinterVideo
 
 sys.path.append('./utils')
 from choose_words import *
+from enigmes import create_bouton_ask_eni
 
 def generer_mot():
     global mot_par_classe, mot_par_len
@@ -68,7 +69,7 @@ def config_classe(event):
     entry_classe.destroy()
     debutjeu.destroy()
 
-def play_video():
+def play_video1():
     global jeu
     #global mot_trouve
 
@@ -91,6 +92,29 @@ def play_video():
             nb_errors+=1
             videoplayer.load(f"../pendu_video/{str(nb_errors)}.mp4")
             videoplayer.play()
+
+def play_video():
+    global jeu
+    global nb_errors
+    global new_error
+    #global mot_trouve
+    c_vid_canvas=tk.Canvas(jeu, width=450, height=350, bg="#404040")
+    c_vid_canvas.place(x = 225, y=75)
+    videoplayer=TkinterVideo(master = jeu, scaled=True)
+    #videoplayer.pack(side = 'top', fill="both")
+    videoplayer.place(x = 250, y=100, height=300, width=400)
+
+    while True:
+        if new_error:
+            videoplayer.load(f"../pendu_video/{str(nb_errors)}.mp4")
+            videoplayer.play()
+            new_error = False
+
+        if nb_errors==14:
+            
+            print('fin')
+            break
+            
 
 def root_debut_jeu():
     #fenetre debut de jeu 
@@ -124,34 +148,56 @@ def confirm_nom(event):
     joueur.configure(text = "Joueur : "+ zone_nom.get())
     zone_nom.destroy() 
 
+
 def creer_croix(event):
-    x_souris = event.x
-    y_souris = event.x
-    pass
-    #prendre les coords de la souris -> savoir lettre -> croix
-'''
-def mot_cache():
-    lettres_images = {'a', 'b', 'c', 'd', 'e', 'f', 'g','h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 
-                      'r', }
-    global jeu
+    global c_mot
+    global lettre_inconnue
     global MOT
-    #Mot[0] lower
-    c_mot = tk.Canvas(height=48, width = 40*len(MOT[0]))
-    for i in range(len(MOT[0])):
-        c_mot.create_image((3,3, anchor = 'nw',image =lettre[i]))
-        #coords
-'''
+    global nb_errors
+    global new_error
+
+    image_to_lettre = 'éabcdefghjiklmnopqrstuvwxyz'
+    lettres_images = {'a':1, 'b':2, 'c':3, 'd':4, 'e':5, 'f':6, 'g':7,'h':8, 'i':10, 'j':9, 'k':11, 'l':12,\
+                    'm':13, 'n':14, 'o':15, 'p':16, 'q':17, 'r':18, 's':19, 't':20, 'u':21, 'v':22, 'w':23,\
+                    'x':24, 'y':25, 'z':26, 'é':0}
+    #ù è ê  _
+
+    event.widget.create_line((0,51), (43, 0))
+    event.widget.create_line((0,0), (43, 51))
+    mot = MOT[0].lower()
+    lettre = image_to_lettre[int(str(event.widget)[8:])-1]
+    print(str(event.widget)[8:], lettre, lettres_images[lettre])
+    if lettre not in mot:
+        nb_errors += 1
+        new_error = True
+    for i in range(len(mot)):
+        if mot[i]==lettre:
+            lettre_inconnue[i]=ImageTk.PhotoImage(Image.open(f'{str(lettres_images[lettre])}.png'))
+            c_mot[i].create_image(3,3, anchor = 'nw',image = lettre_inconnue[i])
+    
+    
+
+    
+
 def root_jeu():
     #fenetre de jeu 
     global joueur
     global jeu
     global zone_nom
+    global canvas
+    global c_mot
+    global lettre_inconnue
+    global nb_errors
+    global new_error
     t_play_video = Thread(target = play_video)
+
+    nb_errors = 0
+    new_error = False
 
     jeu = tk.Tk()
     jeu.title("Jeu du pendu")
     jeu.config(bg ="#C0BCB5")
-    jeu.geometry("900x600") 
+    jeu.geometry("900x660") 
     titre1=tk.Label(jeu, font=('Chalkduster',"30"), text="Le jeu du pendu", bg="#404040", fg="#C0BCB5")
     titre1.pack(side="top")
 
@@ -165,26 +211,28 @@ def root_jeu():
         canvas[i].bind('<Button-1>', creer_croix)
 
     #placement clavier
-    a = 40 
-    b= 500+150
-    for k in range (18,27):
-        canvas[k].place(x = a+50, y=b)
-        a+=50
-    a =55
-    b = 430+150
-    for k in range (10,18):
-        canvas[k].place(x = a+50, y=b)
-        a+=50
-    a = 40 
-    b = 360+150
-    for k in range (1,10):
-        canvas[k].place(x = a+50, y=b)
-        a += 50
-    canvas[0].place(x = 300,y=290)
+    for k in range (0,15):
+        canvas[k].place(x = 90+50*k, y=530)
+    for k in range (15,len(canvas)):
+        canvas[k].place(x = 105+50*(k-15), y=600)
+    
+    #placer le mot
+    c_mot = []
+    lettre_inconnue = []
+    mot = MOT[0].lower()
+    for i in range(len(mot)):
+        c_mot.append(tk.Canvas( bg="#C0BCB5",bd ='0',height=48, width = 40))
+        lettre_inconnue.append(ImageTk.PhotoImage(Image.open('1.png')))
+        c_mot[i].place(x = 450-(40*int(len(mot)/2))+(40*i), y=445)
+        c_mot[i].create_image(3,3, anchor = 'nw',image = lettre_inconnue[i])
+    
+    #enigme
+    create_bouton_ask_eni(mot, jeu)
+    print(mot)
 
     #start of video
     t_play_video.start()
-    
+
 
     #entrer informations du jeu
     zone_nom = tk.Entry(jeu)
