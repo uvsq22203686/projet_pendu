@@ -182,7 +182,6 @@ def root_jeu():
         a += 50
     canvas[0].place(x = 300,y=290)
 
-
     #start of video
     t_play_video.start()
     
