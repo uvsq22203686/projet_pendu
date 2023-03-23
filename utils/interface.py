@@ -8,12 +8,15 @@ import gensim.downloader
 from googletrans import Translator
 from PIL import Image, ImageTk
 import sys
-from threading import Thread
 from tkVideoPlayer import TkinterVideo
 
 sys.path.append('./utils')
 from choose_words import *
-from enigmes import create_bouton_ask_eni
+from enigmes import create_bouton_ask_eni, create_fenetre_def_eni_root
+
+sys.path.remove('./utils')
+sys.path.append('../interface')
+from code2 import gagne_perdu
 
 def generer_mot():
     global mot_par_classe, mot_par_len
@@ -44,13 +47,16 @@ def choix_len():
 def config_len(event):
     global len_user
     global MOT
+    global debutjeu
     len_user = int(entry_len.get())
     MOT = get_words_sorted_by_len(len_user)
-    #! list mot + error
-    mot_par_len.destroy()
-    mot_par_classe.destroy()
-    entry_len.destroy()
-    debutjeu.destroy()
+    if MOT[-1]:
+        t_alert = tk.Label(debutjeu, text=MOT[0])
+        t_alert.pack(side = 'top')
+    else:
+        MOT = MOT[0].lower()
+        debutjeu.destroy()
+        root_jeu()
 
 def choix_classe():
     global entry_classe
@@ -64,57 +70,13 @@ def config_classe(event):
     global MOT
     class_user = str(entry_classe.get())
     MOT = get_words_sorted_by_cat(class_user)
-    mot_par_len.destroy()
-    mot_par_classe.destroy()
-    entry_classe.destroy()
-    debutjeu.destroy()
-
-def play_video1():
-    global jeu
-    #global mot_trouve
-
-    nb_errors = 0
-    c_vid_canvas=tk.Canvas(jeu, width=450, height=350, bg="#404040")
-    c_vid_canvas.place(x = 225, y=75)
-    videoplayer=TkinterVideo(master = jeu, scaled=True)
-    #videoplayer.pack(side = 'top', fill="both")
-    videoplayer.place(x = 250, y=100, height=300, width=400)
-
-    while True:
-        a = input()
-        # au lieu de input() mettre les fonctions 'attendre le choix de la lettre' et 'lettre dans le mot?'
-        #if nb_errors==14 or mot_trouve:
-        if nb_errors==14:
-            #appeler la fonction vous avez perdu
-            print('fin')
-            break
-        if a != 'a':
-            nb_errors+=1
-            videoplayer.load(f"../pendu_video/{str(nb_errors)}.mp4")
-            videoplayer.play()
-
-def play_video():
-    global jeu
-    global nb_errors
-    global new_error
-    #global mot_trouve
-    c_vid_canvas=tk.Canvas(jeu, width=450, height=350, bg="#404040")
-    c_vid_canvas.place(x = 225, y=75)
-    videoplayer=TkinterVideo(master = jeu, scaled=True)
-    #videoplayer.pack(side = 'top', fill="both")
-    videoplayer.place(x = 250, y=100, height=300, width=400)
-
-    while True:
-        if new_error:
-            videoplayer.load(f"../pendu_video/{str(nb_errors)}.mp4")
-            videoplayer.play()
-            new_error = False
-
-        if nb_errors==14:
-            
-            print('fin')
-            break
-            
+    if MOT[-1]:
+        t_alert = tk.Label(debutjeu, text=MOT[0])
+        t_alert.pack(side = 'top')
+    else:
+        MOT = MOT[0].lower()
+        debutjeu.destroy()
+        root_jeu()
 
 def root_debut_jeu():
     #fenetre debut de jeu 
@@ -150,11 +112,14 @@ def confirm_nom(event):
 
 
 def creer_croix(event):
+    global jeu
+    global canvas
     global c_mot
     global lettre_inconnue
     global MOT
     global nb_errors
-    global new_error
+    global videoplayer
+    global mot_non_decouvert
 
     image_to_lettre = 'éabcdefghjiklmnopqrstuvwxyz'
     lettres_images = {'a':1, 'b':2, 'c':3, 'd':4, 'e':5, 'f':6, 'g':7,'h':8, 'i':10, 'j':9, 'k':11, 'l':12,\
@@ -164,20 +129,33 @@ def creer_croix(event):
 
     event.widget.create_line((0,51), (43, 0))
     event.widget.create_line((0,0), (43, 51))
-    mot = MOT[0].lower()
     lettre = image_to_lettre[int(str(event.widget)[8:])-1]
-    print(str(event.widget)[8:], lettre, lettres_images[lettre])
-    if lettre not in mot:
-        nb_errors += 1
-        new_error = True
-    for i in range(len(mot)):
-        if mot[i]==lettre:
-            lettre_inconnue[i]=ImageTk.PhotoImage(Image.open(f'{str(lettres_images[lettre])}.png'))
-            c_mot[i].create_image(3,3, anchor = 'nw',image = lettre_inconnue[i])
-    
-    
+    #print(str(event.widget)[8:], lettre, lettres_images[lettre])
 
-    
+    if lettre not in MOT:
+        nb_errors += 1
+        videoplayer.load(f"../pendu_video/{str(nb_errors)}.mp4")
+        videoplayer.play()
+        if nb_errors == 14:
+            for i in canvas:
+                i.destroy()
+            b_def = tk.Button(jeu, text = f'Definition du mot {MOT}', command = lambda: create_fenetre_def_eni_root(MOT, 'definition'))
+            b_def.place(x = 400, y=530)
+            gagne_perdu(0, MOT)
+    else:
+        for i in range(len(MOT)):
+            if MOT[i]==lettre:
+                lettre_inconnue[i]=ImageTk.PhotoImage(Image.open(f'{str(lettres_images[lettre])}.png'))
+                c_mot[i].create_image(3,3, anchor = 'nw',image = lettre_inconnue[i])
+                mot_non_decouvert-=1
+                print(mot_non_decouvert)
+        if mot_non_decouvert == 0:
+            for i in canvas:
+                i.destroy()
+            b_def = tk.Button(jeu, text = f'Definition du mot {MOT}', command = lambda: create_fenetre_def_eni_root(MOT, 'definition'))
+            b_def.place(x = 400, y=530)
+            gagne_perdu(1)
+      
 
 def root_jeu():
     #fenetre de jeu 
@@ -188,11 +166,12 @@ def root_jeu():
     global c_mot
     global lettre_inconnue
     global nb_errors
-    global new_error
-    t_play_video = Thread(target = play_video)
+    global videoplayer
+    global MOT
+    global mot_non_decouvert
 
     nb_errors = 0
-    new_error = False
+    mot_non_decouvert = len(MOT)
 
     jeu = tk.Tk()
     jeu.title("Jeu du pendu")
@@ -201,6 +180,7 @@ def root_jeu():
     titre1=tk.Label(jeu, font=('Chalkduster',"30"), text="Le jeu du pendu", bg="#404040", fg="#C0BCB5")
     titre1.pack(side="top")
 
+    
     #création du clavier 
     canvas = []
     lettre = []
@@ -216,22 +196,24 @@ def root_jeu():
     for k in range (15,len(canvas)):
         canvas[k].place(x = 105+50*(k-15), y=600)
     
+    #placer video
+    c_vid_canvas=tk.Canvas(jeu, width=450, height=350, bg="#404040")
+    c_vid_canvas.place(x = 225, y=75)
+    videoplayer=TkinterVideo(master = jeu, scaled=True)
+    videoplayer.place(x = 250, y=100, height=300, width=400)
+
     #placer le mot
     c_mot = []
     lettre_inconnue = []
-    mot = MOT[0].lower()
-    for i in range(len(mot)):
+    for i in range(len(MOT)):
         c_mot.append(tk.Canvas( bg="#C0BCB5",bd ='0',height=48, width = 40))
         lettre_inconnue.append(ImageTk.PhotoImage(Image.open('1.png')))
-        c_mot[i].place(x = 450-(40*int(len(mot)/2))+(40*i), y=445)
+        c_mot[i].place(x = 450-(40*int(len(MOT)/2))+(40*i), y=445)
         c_mot[i].create_image(3,3, anchor = 'nw',image = lettre_inconnue[i])
     
     #enigme
-    create_bouton_ask_eni(mot, jeu)
-    print(mot)
-
-    #start of video
-    t_play_video.start()
+    create_bouton_ask_eni(MOT, jeu)
+    print(MOT)
 
 
     #entrer informations du jeu
@@ -246,4 +228,3 @@ def root_jeu():
     jeu.mainloop()
 
 root_debut_jeu()
-root_jeu()

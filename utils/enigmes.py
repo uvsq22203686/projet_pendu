@@ -96,9 +96,12 @@ def make_request(mot, action, sous_action = None):
             if action == 'definition':
                 try:
                     mot_f_m = bs.find('p', 'CatgramDefinition')
+                    #print(mot_f_m)
                     #definitions = bs.find('ul', 'Definitions')
                     definitions = bs.find('li', 'DivisionDefinition')
                     return [mot, mot_f_m.text, definitions.text.split('.\xa0')[1].split('\r')[0]]
+                except AttributeError:
+                     return [mot, '', definitions.text.split('.\xa0')[1].split('\r')[0]]
                 except IndexError:
                     return ["Oh! Ce mot est trop complique! On ne peut pas trouver sa definition.", 'error']
 
@@ -135,7 +138,7 @@ def fermer_fenetre_def_eni_root(def_eni_root):
     def_eni_root.destroy()
 
 
-def create_fenetre_def_eni_root(mot, action, sous_action):
+def create_fenetre_def_eni_root(mot, action, sous_action = None):
     '''cree une fenetre qui affiche la definition
     ou l'enigme'''
     res = make_request(mot, action, sous_action)
@@ -191,11 +194,11 @@ def choisir_sous_action(s_action):
     global sous_action
     sous_action = s_action
 
-def create_bouton_ask_eni(mot):
+def create_bouton_ask_eni(mot, ask_eni_root):
     '''Affiche le bouton qui affiche des enigmes et un bouton
     qui permet de choisir le type d'enigme '''
     global sous_action
-    ask_eni_root = tk.Tk()
+    #ask_eni_root = tk.Tk()
 
     ask_eni_bouton = tk.Button(ask_eni_root, text='Enigme', command = lambda: create_fenetre_def_eni_root(mot, 'enigme', sous_action))
     ask_eni_bouton1 =  tk.Menubutton(ask_eni_root, text = "Choisir le type d'enigme", relief = 'ridge',fg='white', bg='green' )
@@ -207,10 +210,10 @@ def create_bouton_ask_eni(mot):
     ask_eni_bouton1.menu.add_command(label = 'Locution', command = lambda : choisir_sous_action('locutions'))
     ask_eni_bouton1.menu.add_command(label = 'Tout', command = lambda : choisir_sous_action(None))
 
-    ask_eni_bouton.grid(column = 0, row = 0)
-    ask_eni_bouton1.grid(column = 1, row = 0)
+    ask_eni_bouton.place(x = 450+(40*int(len(mot)/2))+50, y=445)
+    ask_eni_bouton1.place(x = 450+(40*int(len(mot)/2))+50, y=465)
 
-    ask_eni_root.mainloop()
+    #ask_eni_root.mainloop()
 
 
 
