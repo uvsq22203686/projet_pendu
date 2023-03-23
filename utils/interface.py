@@ -78,6 +78,53 @@ def config_classe(event):
         debutjeu.destroy()
         root_jeu()
 
+def fontionrecommencer():
+    global jeu
+    global racine
+    jeu.destroy()
+    racine.destroy()
+    root_debut_jeu()
+
+def gagne_perdu(gagne_perdu, mot = ''):
+    global racine
+    racine = tk.Tk()
+    racine.geometry("600x350")
+    
+    if gagne_perdu:
+        racine.title("Gagne!")
+        #changer le path!
+        img= Image.open('../interface/CONFETTIS 2.png')
+        img = img.resize((600, 350))
+        img = ImageTk.PhotoImage(img, master = racine)
+        label = tk.Label(racine, image = img)
+        label.place(x=0, y=0)
+        gagne=tk.Label(racine, text = "Félicitations vous avez gagné !",font=("Arial", 25))
+        gagne.place(x = 75, y = 130)
+    
+    else:
+        racine.title("Perdu")
+        img= Image.open('../interface/rouge.png')
+        img = img.resize((400, 200))
+        img = ImageTk.PhotoImage(img, master = racine)
+        label = tk.Label(racine, image = img)
+        label.place(x=100, y=75)
+        gagne=tk.Label(racine, text = "Vous avez perdu.",font=("Arial", 25))
+        perdu = tk.Label(racine, text = f"Le mot cache etait {mot}.")
+        gagne.place(x = 180, y = 100)
+        perdu.place(x = 225, y = 160)
+
+    #boutons
+    restart2 = tk.Button(racine, text="Recommencer une partie à plusieurs joueurs ", command = fontionrecommencer,font=("Arial", 15))#mettre le code en comman
+    restart2.place(x=125, y = 210)
+    restart1 = tk.Button(racine, text="Recommencer une partie à 1 joueur", command = fontionrecommencer,font=("Arial", 15)) 
+    restart1.place(x=130, y = 270)
+
+    #nb victoires changer par la fonction
+    victoires = 3
+    sessions = tk.Label(racine,text=f"Tu as gagné {victoires} sessions", font=("Arial", 10))
+    sessions.place(x = 450, y = 0)
+    racine.mainloop()
+
 def root_debut_jeu():
     #fenetre debut de jeu 
     global play
@@ -109,7 +156,6 @@ def confirm_nom(event):
     global zone_nom
     joueur.configure(text = "Joueur : "+ zone_nom.get())
     zone_nom.destroy() 
-
 
 def creer_croix(event):
     global jeu
@@ -156,7 +202,6 @@ def creer_croix(event):
             b_def.place(x = 400, y=530)
             gagne_perdu(1)
       
-
 def root_jeu():
     #fenetre de jeu 
     global joueur

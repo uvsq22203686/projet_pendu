@@ -8,11 +8,15 @@ def homonyme(bs):
         '''Cherche la definition de l'homonyme du mot'''
 
         res = bs.find('a', 'lienarticle').text
-        res = ["La definition de l'homonyme de ce mot est la suivante:",
-            make_request(res, 'definition')[2], 'homonyme']
+        definition = make_request(res, 'definition')
+        try:
+            res = ["La definition de l'homonyme de ce mot est la suivante:",
+                definition[2], 'homonyme']
+        except IndexError:
+             res = definition[0]
         return res
 
-def locution(bs, mot):
+def locution1(bs, mot):
         '''Cherche la locution avec le mot donne'''
         res_valide = False
         index_invalid = True
@@ -45,6 +49,22 @@ def locution(bs, mot):
                         res+=i
                         res+=' '
                 res = ['Voici une locution avec ce mot:', res[:-1]+'.', 'locution']
+        return res
+
+def locution(bs, mot):
+        '''Cherche la locution avec le mot donne'''
+        res_valide = False
+        index_invalid = True
+        max_index = 8
+
+        res1 = bs.find('li', 'Locution').text.split(' ')
+        res = ''
+        for i in res1:
+            if i.lower().__contains__(mot):
+                i = '...'
+            res+=i
+            res+=' '
+        res = ['Voici une locution avec ce mot:', res[:-1]+'.', 'locution']
         return res
 
 def citation(bs, mot):
@@ -101,8 +121,10 @@ def make_request(mot, action, sous_action = None):
                     definitions = bs.find('li', 'DivisionDefinition')
                     return [mot, mot_f_m.text, definitions.text.split('.\xa0')[1].split('\r')[0]]
                 except AttributeError:
-                     return [mot, '', definitions.text.split('.\xa0')[1].split('\r')[0]]
+                     print(definitions.text)
+                     return [mot, '', definitions.text]
                 except IndexError:
+                    print(definitions.text)
                     return ["Oh! Ce mot est trop complique! On ne peut pas trouver sa definition.", 'error']
 
             elif action == 'enigme':
