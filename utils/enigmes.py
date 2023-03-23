@@ -9,11 +9,13 @@ def homonyme(bs):
 
         res = bs.find('a', 'lienarticle').text
         definition = make_request(res, 'definition')
-        try:
-            res = ["La definition de l'homonyme de ce mot est la suivante:",
-                definition[2], 'homonyme']
-        except IndexError:
+        if definition[1]=='error':
              res = definition[0]
+             #print(res, definition )
+        else:
+             res = ["La definition de l'homonyme de ce mot est la suivante:",
+                definition[2].split('Synonymes')[0], 'homonyme']
+             #print(res, definition)
         return res
 
 def locution1(bs, mot):
@@ -58,6 +60,7 @@ def locution(bs, mot):
         max_index = 8
 
         res1 = bs.find('li', 'Locution').text.split(' ')
+        print(res1)
         res = ''
         for i in res1:
             if i.lower().__contains__(mot):
