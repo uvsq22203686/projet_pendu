@@ -191,7 +191,7 @@ def creer_croix(event):
     else:
         for i in range(len(MOT)):
             if MOT[i]==lettre:
-                lettre_inconnue[i]=ImageTk.PhotoImage(Image.open(f'{str(lettres_images[lettre])}.png'))
+                lettre_inconnue[i]=ImageTk.PhotoImage(Image.open(f'./lettres/{str(lettres_images[lettre])}.png'))
                 c_mot[i].create_image(3,3, anchor = 'nw',image = lettre_inconnue[i])
                 mot_non_decouvert-=1
                 print(mot_non_decouvert)
@@ -231,7 +231,7 @@ def root_jeu():
     lettre = []
     for i in range(0,27): 
         canvas.append(tk.Canvas(jeu, bg="#C0BCB5",bd ='0',height=48, width = 40))
-        lettre.append(ImageTk.PhotoImage(Image.open('%s.png'%i)))
+        lettre.append(ImageTk.PhotoImage(Image.open('./lettres/%s.png'%i)))
         canvas[i].create_image(3,3,anchor = 'nw',image =lettre[i])
         canvas[i].bind('<Button-1>', creer_croix)
 
@@ -252,7 +252,7 @@ def root_jeu():
     lettre_inconnue = []
     for i in range(len(MOT)):
         c_mot.append(tk.Canvas( bg="#C0BCB5",bd ='0',height=48, width = 40))
-        lettre_inconnue.append(ImageTk.PhotoImage(Image.open('1.png')))
+        lettre_inconnue.append(ImageTk.PhotoImage(Image.open('./lettres/1.png')))
         c_mot[i].place(x = 450-(40*int(len(MOT)/2))+(40*i), y=445)
         c_mot[i].create_image(3,3, anchor = 'nw',image = lettre_inconnue[i])
     

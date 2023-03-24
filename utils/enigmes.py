@@ -50,7 +50,7 @@ def locution1(bs, mot):
                             i = '...'
                         res+=i
                         res+=' '
-                res = ['Voici une locution avec ce mot:', res[:-1]+'.', 'locution']
+                res = ['Voici une locution avec ce mot:', res[:-1], 'locution']
         return res
 
 def locution(bs, mot):
