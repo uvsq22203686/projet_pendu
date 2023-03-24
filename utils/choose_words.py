@@ -12,7 +12,7 @@ dict_len_word = None
 dict_cat_word = None
 
 def load_words_sorted_by_len():
-    p = os.path.abspath('./dict/french_dict.pkl')
+    p = os.path.abspath('./dict/french_dict1.pkl')
     with open(p, 'rb') as d:
         mots = pickle.load(d)
     
@@ -53,4 +53,3 @@ def get_words_sorted_by_cat(categorie):
     word = dict_cat_word.most_similar(categorie , topn = 3)[randint(0,2)]
     word = translator.translate(word, src = 'en', dest='fr').text
     return [word, False]
-
