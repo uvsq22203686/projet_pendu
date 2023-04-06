@@ -118,18 +118,19 @@ def make_request(mot, action, sous_action = None):
             
             if action == 'definition':
                 try:
-                    mot_f_m = bs.find('p', 'CatgramDefinition')
-                    #print(mot_f_m)
-                    #definitions = bs.find('ul', 'Definitions')
-                    definitions = bs.find('li', 'DivisionDefinition')
-                    return [mot, mot_f_m.text, definitions.text.split('.\xa0')[1].split('\r')[0]]
-                except AttributeError:
-                     print(definitions.text)
-                     return [mot, '', definitions.text]
+                    try:
+                        mot_f_m = bs.find('p', 'CatgramDefinition')
+                        #print(mot_f_m)
+                        #definitions = bs.find('ul', 'Definitions')
+                        definitions = bs.find('li', 'DivisionDefinition')
+                        return [mot, mot_f_m.text, definitions.text.split('.\xa0')[1].split('\r')[0]]
+                    except AttributeError:
+                        print(definitions.text)
+                        return [mot, '', definitions.text]
                 except IndexError:
                     print(definitions.text)
                     return ["Oh! Ce mot est trop complique! On ne peut pas trouver sa definition.", 'error']
-
+                
             elif action == 'enigme':
                 actions = ['homonymes', 'locutions', 'citation']
                 if sous_action == None:
