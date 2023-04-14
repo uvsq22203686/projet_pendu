@@ -9,14 +9,15 @@ from googletrans import Translator
 from PIL import Image, ImageTk
 import sys
 from tkVideoPlayer import TkinterVideo
+import json
 
 sys.path.append('./utils')
 from choose_words import *
 from enigmes import create_bouton_ask_eni, create_fenetre_def_eni_root
 
-sys.path.remove('./utils')
-sys.path.append('../interface')
-from code2 import gagne_perdu
+
+nom = "Current"
+current_nb_gagne = 0
 
 def generer_mot():
     global mot_par_classe, mot_par_len
@@ -78,19 +79,41 @@ def config_classe(event):
         debutjeu.destroy()
         root_jeu()
 
-def fontionrecommencer():
+def fontionrecommencer(dico_joueurs_gagne):
     global jeu
     global racine
+
+    json.dump(dico_joueurs_gagne, open("dico_joueurs_gagne.json","w"))
+
+
     jeu.destroy()
     racine.destroy()
     root_debut_jeu()
 
 def gagne_perdu(gagne_perdu, mot = ''):
     global racine
+    global nom
+    global current_nb_gagne
+
+    with open('dico_joueurs_gagne.json', 'r') as f:
+        dico_joueurs_gagne = json.load(f)
+    
+
+
     racine = tk.Tk()
     racine.geometry("600x350")
     
     if gagne_perdu:
+
+        print(list(dico_joueurs_gagne))
+        if nom == "Current":
+            current_nb_gagne += 1
+            dico_joueurs_gagne["Current"] = current_nb_gagne
+        elif nom not in list(dico_joueurs_gagne):
+            dico_joueurs_gagne[nom] = 1
+        else:
+            dico_joueurs_gagne[nom] += 1
+
         racine.title("Gagne!")
         #changer le path!
         img= Image.open('../interface/CONFETTIS 2.png')
@@ -100,8 +123,14 @@ def gagne_perdu(gagne_perdu, mot = ''):
         label.place(x=0, y=0)
         gagne=tk.Label(racine, text = "Félicitations vous avez gagné !",font=("Arial", 25))
         gagne.place(x = 75, y = 130)
+
     
     else:
+        if nom == "Current":
+            dico_joueurs_gagne["Current"] = current_nb_gagne
+        elif nom not in list(dico_joueurs_gagne):
+            dico_joueurs_gagne[nom] = 0
+
         racine.title("Perdu")
         img= Image.open('../interface/rouge.png')
         img = img.resize((400, 200))
@@ -114,14 +143,15 @@ def gagne_perdu(gagne_perdu, mot = ''):
         perdu.place(x = 225, y = 160)
 
     #boutons
-    restart2 = tk.Button(racine, text="Recommencer une partie à plusieurs joueurs ", command = fontionrecommencer,font=("Arial", 15))#mettre le code en comman
+    restart2 = tk.Button(racine, text="Recommencer une partie à plusieurs joueurs ",
+                          command = lambda: fontionrecommencer(dico_joueurs_gagne),font=("Arial", 15))#mettre le code en comman
     restart2.place(x=125, y = 210)
-    restart1 = tk.Button(racine, text="Recommencer une partie à 1 joueur", command = fontionrecommencer,font=("Arial", 15)) 
+    restart1 = tk.Button(racine, text="Recommencer une partie à 1 joueur",
+                          command = lambda: fontionrecommencer(dico_joueurs_gagne),font=("Arial", 15)) 
     restart1.place(x=130, y = 270)
 
     #nb victoires changer par la fonction
-    victoires = 3
-    sessions = tk.Label(racine,text=f"Tu as gagné {victoires} sessions", font=("Arial", 10))
+    sessions = tk.Label(racine,text=f"Tu as gagné {dico_joueurs_gagne[nom]} sessions", font=("Arial", 10))
     sessions.place(x = 450, y = 0)
     racine.mainloop()
 
@@ -159,7 +189,10 @@ def root_debut_jeu():
 def confirm_nom(event):  
     global joueur   
     global zone_nom
-    joueur.configure(text = "Joueur : "+ zone_nom.get())
+    global nom
+
+    nom = zone_nom.get()
+    joueur.configure(text = "Joueur : "+ nom)
     zone_nom.destroy() 
 
 def creer_croix(event):
