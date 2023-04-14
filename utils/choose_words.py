@@ -29,7 +29,6 @@ def get_words_sorted_by_len(word_len):
     
     if word_len in list( dict_len_word):
         word = dict_len_word[word_len][randint(0, len(dict_len_word[word_len])-1)]
-
         # indique s'il y a une erreur erreur = False
         return [word, False]
     else:
@@ -50,6 +49,9 @@ def get_words_sorted_by_cat(categorie):
         word_cat_first_time = False
 
     categorie = translator.translate(categorie, src = 'fr', dest='en').text
-    word = dict_cat_word.most_similar(categorie , topn = 3)[randint(0,2)]
-    word = translator.translate(word, src = 'en', dest='fr').text
-    return [word, False]
+    try:
+        word = dict_cat_word.most_similar(categorie , topn = 3)[randint(0,2)]
+        word = translator.translate(word, src = 'en', dest='fr').text
+        return [word, False]
+    except KeyError:
+        return ["Cette categorie n'existe pas, veillez choisir un autre mot", True]

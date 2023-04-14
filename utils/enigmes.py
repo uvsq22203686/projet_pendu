@@ -2,6 +2,9 @@ from bs4 import BeautifulSoup
 import requests
 from random import randint
 import tkinter as tk
+import spacy
+
+nlp = spacy.load('fr_core_news_md')
 
 
 def homonyme(bs):
@@ -44,8 +47,20 @@ def locution1(bs, mot):
                 else:
                         res_valide = True
                 res1 = res1.split(' ')
+                res_lemma = nlp(res1)
                 res = ''
-                for i in res1:
+                try:
+                    for i in range(len(res1)):
+                            if res_lemma[i] == mot:
+                                res += '...'
+                                res+=' '
+                            else:
+                                res+= res1[i]
+                                res+=' '
+                except:
+                    print("Merci de telecharger le spacy french core")
+                    res = ''
+                    for i in res1:
                         if i.lower().__contains__(mot):
                             i = '...'
                         res+=i
@@ -61,12 +76,26 @@ def locution(bs, mot):
 
         res1 = bs.find('li', 'Locution').text.split(' ')
         print(res1)
-        res = ''
-        for i in res1:
-            if i.lower().__contains__(mot):
-                i = '...'
-            res+=i
-            res+=' '
+        
+        try:
+            res_lemma = nlp(res1)
+            res = ''
+            for i in range(len(res1)):  
+                if res_lemma[i] == mot:
+                    res += '...'
+                    res+=' '
+                else:
+                    res+= res1[i]
+                    res+=' '
+        except:
+            print("Merci de telecharger le spacy french core")
+            res = ''
+            for i in res1:
+                if i.lower().__contains__(mot):
+                    i = '...'
+                res+=i
+                res+=' '
+
         res = ['Voici une locution avec ce mot:', res[:-1]+'.', 'locution']
         return res
 
@@ -134,7 +163,7 @@ def make_request(mot, action, sous_action = None):
             elif action == 'enigme':
                 actions = ['homonymes', 'locutions', 'citation']
                 if sous_action == None:
-                    ca_marche = False
+                    #ca_marche = False
                     while len(actions)>=1:
                         sous_action = actions.pop(randint(0, len(actions)-1))
                         res = enigme(sous_action, bs, mot)
@@ -167,6 +196,11 @@ def fermer_fenetre_def_eni_root(def_eni_root):
 def create_fenetre_def_eni_root(mot, action, sous_action = None):
     '''cree une fenetre qui affiche la definition
     ou l'enigme'''
+    try:
+        mot = nlp(mot)
+        mot = mot[0].lemma_
+    except: pass
+
     res = make_request(mot, action, sous_action)
 
     def_eni_root = tk.Tk()

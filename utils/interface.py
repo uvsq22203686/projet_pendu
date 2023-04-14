@@ -125,6 +125,9 @@ def gagne_perdu(gagne_perdu, mot = ''):
     sessions.place(x = 450, y = 0)
     racine.mainloop()
 
+def destroy_root(root):
+    root.destroy()
+
 def root_debut_jeu():
     #fenetre debut de jeu 
     global play
@@ -143,10 +146,12 @@ def root_debut_jeu():
     play.create_image(0,0,anchor = 'nw', image=photo)
     titre=tk.Label(debutjeu, font=('Chalkduster',"50"), text="Le jeu du pendu", bg="#404040", fg="#C0BCB5")
     phrase=tk.Label(debutjeu, font=('Chalkduster',"30"), text="Allez-vous réussir à échapper à la pendaison ?", fg="#404040", bg='#C0BCB5')
+    b_quitter = tk.Button(debutjeu, text = 'Quitter', command = lambda: destroy_root(debutjeu))
     #placement accueil
     titre.pack(side='top', pady='15')
     play.pack()
     phrase.pack(side = 'bottom')
+    b_quitter.pack(side = 'bottom')
 
     play.bind("<Button-1>", debut)
     debutjeu.mainloop()
@@ -227,7 +232,6 @@ def root_jeu():
     jeu.geometry("900x720") 
     titre1=tk.Label(jeu, font=('Chalkduster',"30"), text="Le jeu du pendu", bg="#404040", fg="#C0BCB5")
     titre1.pack(side="top")
-
     
     #création du clavier 
     canvas = []
@@ -274,6 +278,9 @@ def root_jeu():
     zone_nom.place(x=60, y=0, anchor='nw')
     joueur.place(x = 0, y =3, anchor='nw')
 
+
+    b_quitter = tk.Button(jeu, text = 'Quitter', command = lambda: destroy_root(jeu))
+    b_quitter.pack(side='bottom')
 
     jeu.mainloop()
 
