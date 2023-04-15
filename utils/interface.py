@@ -10,6 +10,9 @@ from PIL import Image, ImageTk
 import sys
 from tkVideoPlayer import TkinterVideo
 import json
+import threading
+#
+import spacy
 
 sys.path.append('./utils')
 from choose_words import *
@@ -18,6 +21,7 @@ from enigmes import create_bouton_ask_eni, create_fenetre_def_eni_root
 
 nom = "Current"
 current_nb_gagne = 0
+
 
 def generer_mot():
     global mot_par_classe, mot_par_len
@@ -36,8 +40,10 @@ def debut(event):
     play.destroy()
     phrase.destroy()
     titre.config(font=('Chalkduster',"30"))
-    creer_mot = tk.Button(debutjeu,text="Générer un mot", command=generer_mot)
-    creer_mot.pack(fill ='y', side= 'top')
+    creer_mot = tk.Button(debutjeu,text="Générer un mot", font=('Chalkduster',"15"), fg = "#5A5A5A",
+                          command=generer_mot, relief = 'ridge')
+    #creer_mot.pack(fill ='y', side= 'top')
+    creer_mot.place(x = 380, y = 290)
 
 def choix_len():
     global entry_len
@@ -69,8 +75,11 @@ def config_classe(event):
     global class_user
     global debutjeu 
     global MOT
+    global dict_cat_word
+    global nlp
+
     class_user = str(entry_classe.get())
-    MOT = get_words_sorted_by_cat(class_user)
+    MOT = get_words_sorted_by_cat(class_user, dict_cat_word, nlp)
     if MOT[-1]:
         t_alert = tk.Label(debutjeu, text=MOT[0])
         t_alert.pack(side = 'top')
@@ -171,17 +180,18 @@ def root_debut_jeu():
     debutjeu.geometry("900x600")
 
     #création widgets accueil
-    play = tk.Canvas(debutjeu, height=250, width=400, bg ="#C0BCB5", bd='5')
+    play = tk.Canvas(debutjeu, height=250, width=400, bg ="#C0BCB5", bd='0', highlightthickness=0)
     photo = ImageTk.PhotoImage(Image.open("play1.png")) 
     play.create_image(0,0,anchor = 'nw', image=photo)
-    titre=tk.Label(debutjeu, font=('Chalkduster',"50"), text="Le jeu du pendu", bg="#404040", fg="#C0BCB5")
-    phrase=tk.Label(debutjeu, font=('Chalkduster',"30"), text="Allez-vous réussir à échapper à la pendaison ?", fg="#404040", bg='#C0BCB5')
-    b_quitter = tk.Button(debutjeu, text = 'Quitter', command = lambda: destroy_root(debutjeu))
+    titre=tk.Label(debutjeu, font=('Chalkduster',"30"), text="Le jeu du pendu", bg="#5A5A5A", fg="#C0BCB5")
+    phrase=tk.Label(debutjeu, font=('Chalkduster',"15"), text="Allez-vous réussir à échapper à la pendaison ?", fg="#404040", bg='#C0BCB5')
+    b_quitter = tk.Button(debutjeu, text = 'Quitter', command = lambda: destroy_root(debutjeu), 
+                          relief = 'ridge', bg = '#5C5C5C')
     #placement accueil
-    titre.pack(side='top', pady='15')
-    play.pack()
-    phrase.pack(side = 'bottom')
-    b_quitter.pack(side = 'bottom')
+    titre.pack(side = 'top', pady= 20)
+    play.place(x = 250, y = 150)
+    phrase.place(x = 250, y = 430)
+    b_quitter.pack(side = 'bottom', pady = 15)
 
     play.bind("<Button-1>", debut)
     debutjeu.mainloop()
@@ -204,8 +214,10 @@ def creer_croix(event):
     global nb_errors
     global videoplayer
     global mot_non_decouvert
+    global image_to_lettre
 
-    image_to_lettre = "éabcdefghjiklmnopqrstuvwxyzàèêëîïöù- '"
+    #image_to_lettre = "éabcdefghjiklmnopqrstuvwxyzàèêëîïöù- '"
+
     lettres_images = {'a':1, 'b':2, 'c':3, 'd':4, 'e':5, 'f':6, 'g':7,'h':8, 'i':10, 'j':9, 'k':11, 'l':12,\
                     'm':13, 'n':14, 'o':15, 'p':16, 'q':17, 'r':18, 's':19, 't':20, 'u':21, 'v':22, 'w':23,\
                     'x':24, 'y':25, 'z':26, 'é':0, 'à':27, "è":28, "ê":29, "ë": 30, "î":31, "ï": 32,\
@@ -214,10 +226,15 @@ def creer_croix(event):
 
     event.widget.create_line((0,51), (43, 0))
     event.widget.create_line((0,0), (43, 51))
-    lettre = image_to_lettre[int(str(event.widget)[8:])-1]
+    try:
+        lettre = image_to_lettre[int(str(event.widget)[8:])]
+        image_to_lettre[int(str(event.widget)[8:])] = '0'
+    except:
+        lettre = image_to_lettre[1]
+        image_to_lettre[1] = '0'
     #print(str(event.widget)[8:], lettre, lettres_images[lettre])
 
-    if lettre not in MOT:
+    if lettre not in MOT and lettre != '0':
         nb_errors += 1
         videoplayer.load(f"../pendu_video/{str(nb_errors)}.mp4")
         videoplayer.play()
@@ -228,7 +245,8 @@ def creer_croix(event):
             b_def = tk.Button(jeu, text = f'Definition du mot {MOT}', command = lambda: create_fenetre_def_eni_root(MOT, 'definition'))
             b_def.place(x = 400, y=530)
             gagne_perdu(0, MOT)
-    else:
+    #else:
+    elif lettre != '0':
         for i in range(len(MOT)):
             if MOT[i]==lettre:
                 lettre_inconnue[i]=ImageTk.PhotoImage(Image.open(f'./lettres/{str(lettres_images[lettre])}.png'))
@@ -239,10 +257,15 @@ def creer_croix(event):
             for i in canvas:
                 i.destroy()
             jeu.geometry("900x600") 
-            b_def = tk.Button(jeu, text = f'Definition du mot {MOT}', command = lambda: create_fenetre_def_eni_root(MOT, 'definition'))
+            b_def = tk.Button(jeu, text = f'Definition du mot {MOT}', 
+                              command = lambda: create_fenetre_def_eni_root(MOT, 'definition'))
             b_def.place(x = 400, y=530)
             gagne_perdu(1)
-      
+
+def recommencer(jeu):
+    jeu.destroy()
+    root_debut_jeu()
+
 def root_jeu():
     #fenetre de jeu 
     global joueur
@@ -255,9 +278,13 @@ def root_jeu():
     global videoplayer
     global MOT
     global mot_non_decouvert
+    global image_to_lettre
 
     nb_errors = 0
     mot_non_decouvert = len(MOT)
+
+    image_to_lettre = ['0','é', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'j','i', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's',
+                        't', 'u', 'v', 'w', 'x', 'y', 'z', 'à', 'è', 'ê', 'ë', 'î', 'ï', 'ö', 'ù', '-', ' ', "'"]
 
     jeu = tk.Tk()
     jeu.title("Jeu du pendu")
@@ -299,7 +326,7 @@ def root_jeu():
         c_mot[i].create_image(3,3, anchor = 'nw',image = lettre_inconnue[i])
     
     #enigme
-    create_bouton_ask_eni(MOT, jeu)
+    create_bouton_ask_eni(MOT, jeu, image_to_lettre, nlp)
     print(MOT)
 
 
@@ -311,10 +338,65 @@ def root_jeu():
     zone_nom.place(x=60, y=0, anchor='nw')
     joueur.place(x = 0, y =3, anchor='nw')
 
+    b_recommencer = tk.Button(jeu, text = 'Recommencer', command = lambda: recommencer(jeu), 
+                          relief = 'ridge', bg = '#5C5C5C')
+    b_recommencer.place(x = 800, y = 20)
 
-    b_quitter = tk.Button(jeu, text = 'Quitter', command = lambda: destroy_root(jeu))
-    b_quitter.pack(side='bottom')
+    b_quitter = tk.Button(jeu, text = 'Quitter', command = lambda: destroy_root(jeu), 
+                          relief = 'ridge', bg = '#5C5C5C')
+    b_quitter.place(x = 820, y =50)
 
     jeu.mainloop()
 
+
+
+
+
+def load_lib_nlp():
+    global nlp
+    nlp = spacy.load('fr_core_news_md') 
+    return 0
+
+def load_lib_glove():
+    global dict_cat_word
+    dict_cat_word = gensim.downloader.load('glove-wiki-gigaword-50')
+    return 0
+    
+def wait_load_lib():
+    global root
+    root = tk.Tk()
+    root.title('Pendu')
+    root.config(bg ="#C0BCB5")
+    root.geometry("600x400") 
+
+    titre=tk.Label(root, font=('Chalkduster',"30"), text="Le jeu du pendu", bg="#C0BCB5", fg="#404040")
+    titre.place(x = 150, y = 120)
+    
+    
+    l_attendre = tk.Label(root,text = 'Le jeu commencera bientot', font=('Chalkduster',"10"),bg="#C0BCB5", fg="#404040")
+    s_attendre = tk.Scale(root, from_ = 0, to = 10 , orient = 'horizontal',bg="#C0BCB5", 
+                          showvalue = 0, length = 200,  troughcolor= "#404040")
+    
+    l_attendre.place(x = 210, y = 200)
+    s_attendre.place(x = 190, y = 250)
+    
+    t1_1 = threading.Thread(target = load_lib_nlp)
+    t1_2 = threading.Thread(target = load_lib_glove)
+
+    t1_1.start()
+    t1_2.start()
+    for i in range(11):
+        s_attendre.set(i)
+        root.update()
+        root.after(500)
+    destroy_root(root)
+    
+    root.mainloop()
+
+
+wait_load_lib()
 root_debut_jeu()
+
+
+
+
