@@ -32,26 +32,31 @@ def get_words_sorted_by_len(word_len):
         # indique s'il y a une erreur erreur = False
         return [word, False]
     else:
-        return ['On ne sait pas de mot de cette longeur. Veuillez choisir une autre lonheur', True]
+        return ['On ne sait pas de mot de cette longeur. Veuillez choisir une autre longueur', True]
     
 
-def get_words_sorted_by_cat(categorie):
+def get_words_sorted_by_cat(categorie, dict_cat_word, nlp):
     #^ make async with 'we are proceeding your request'
     #+ assert category -> str
     global word_cat_first_time
-    global dict_cat_word
+    #global dict_cat_word
     translator = Translator()
-
+    '''
     if word_cat_first_time:
         # faire async telechargement
         #ou faire l'onglet 'ca telecharge'
         dict_cat_word = gensim.downloader.load('glove-wiki-gigaword-50')
         word_cat_first_time = False
-
-    categorie = translator.translate(categorie, src = 'fr', dest='en').text
+    '''
+    categorie1 = translator.translate(categorie, src = 'fr', dest='en').text
     try:
-        word = dict_cat_word.most_similar(categorie , topn = 3)[randint(0,2)]
-        word = translator.translate(word, src = 'en', dest='fr').text
+        for i in range(3):
+            word = dict_cat_word.most_similar(categorie1, topn = 3)[randint(0,2)][0]
+            word = translator.translate(word, src = 'en', dest='fr').text
+            if (nlp(word)[0].lemma_) != (nlp(categorie)[0].lemma_):
+                break
+
+        
         return [word, False]
     except KeyError:
         return ["Cette categorie n'existe pas, veillez choisir un autre mot", True]

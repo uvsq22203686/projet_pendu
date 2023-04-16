@@ -3,9 +3,18 @@ import requests
 from random import randint
 import tkinter as tk
 import spacy
+import sys
 
-nlp = spacy.load('fr_core_news_md')
+#nlp = spacy.load('fr_core_news_md')
 
+def enigme_lettre():
+    global MOT
+    global image_to_lettre
+
+    for i in range(len(MOT)) :
+        if MOT[i] in image_to_lettre: 
+            return ['Astuce:', f'La {i+1}ème lettre est {MOT[i].upper()}', 'lettre']
+    return ['Astuce:','Tu sait deja toutes les lettres du mot', 'lettre']
 
 def homonyme(bs):
         '''Cherche la definition de l'homonyme du mot'''
@@ -13,81 +22,44 @@ def homonyme(bs):
         res = bs.find('a', 'lienarticle').text
         definition = make_request(res, 'definition')
         if definition[1]=='error':
-             res = definition[0]
-             #print(res, definition )
+            res = [definition[0], '', 'honomyme']
+            print(res)
         else:
-             res = ["La definition de l'homonyme de ce mot est la suivante:",
-                definition[2].split('Synonymes')[0], 'homonyme']
+            res = ["La definition de l'homonyme de ce mot est la suivante:",
+                    definition[2].split('Synonymes')[0], 'homonyme']
+            print(definition, definition[2]) 
+            
+
              #print(res, definition)
         return res
 
-def locution1(bs, mot):
-        '''Cherche la locution avec le mot donne'''
-        res_valide = False
-        index_invalid = True
-        max_index = 8
-
-        res = bs.find('ul', 'ListeLocutions').text[:1000].split('.')
-        while index_invalid:
-            try:
-                res1 = res[randint(1,max_index)]
-                index_invalid = False
-            except IndexError:
-                  max_index-=1
-
-        while res_valide == False:
-                index_invalid = True
-                if len(res1)<20:
-                        while index_invalid:
-                            try:
-                                res1 = res[randint(1,max_index)]
-                                index_invalid = False
-                            except IndexError:
-                                max_index-=1
-                else:
-                        res_valide = True
-                res1 = res1.split(' ')
-                res_lemma = nlp(res1)
-                res = ''
-                try:
-                    for i in range(len(res1)):
-                            if res_lemma[i] == mot:
-                                res += '...'
-                                res+=' '
-                            else:
-                                res+= res1[i]
-                                res+=' '
-                except:
-                    print("Merci de telecharger le spacy french core")
-                    res = ''
-                    for i in res1:
-                        if i.lower().__contains__(mot):
-                            i = '...'
-                        res+=i
-                        res+=' '
-                res = ['Voici une locution avec ce mot:', res[:-1], 'locution']
-        return res
 
 def locution(bs, mot):
         '''Cherche la locution avec le mot donne'''
+        global nlp
+
         res_valide = False
         index_invalid = True
         max_index = 8
 
-        res1 = bs.find('li', 'Locution').text.split(' ')
-        print(res1)
+        #res1 = bs.find('li', 'Locution').text.split(' ')
+        #print(res1)
+        res1 = bs.find('li', 'Locution').text
+        print('a', res1)
         
-        try:
-            res_lemma = nlp(res1)
-            res = ''
-            for i in range(len(res1)):  
-                if res_lemma[i] == mot:
+        #try:
+        res_lemma = nlp(res1)
+        mot = nlp(mot)
+        mot = mot[0].lemma_
+        res = ''
+        for i in range(len(res_lemma)):
+            if res_lemma[i].lemma_ == mot:
                     res += '...'
                     res+=' '
-                else:
-                    res+= res1[i]
+            else:
+                    res+= res_lemma[i].text
                     res+=' '
-        except:
+        '''except:
             print("Merci de telecharger le spacy french core")
             res = ''
             for i in res1:
@@ -95,8 +67,8 @@ def locution(bs, mot):
                     i = '...'
                 res+=i
                 res+=' '
-
-        res = ['Voici une locution avec ce mot:', res[:-1]+'.', 'locution']
+        '''
+        res = ['Voici une locution avec ce mot:', res, 'locution']
         return res
 
 def citation(bs, mot):
@@ -105,14 +77,27 @@ def citation(bs, mot):
         res = [bs.find('span', 'AuteurCitation').text]
         res.append(bs.find('span', 'TexteCitation').text)
         res.append(bs.find('span', 'InfoCitation').text)
+
+        res_lemma = nlp(res[1])
+        mot = nlp(mot)
+        mot = mot[0].lemma_
+        res1 = ''
+        for i in range(len(res_lemma)):
+            if res_lemma[i].lemma_ == mot:
+                    res1 += '...'
+                    res1+=' '
+            else:
+                    res1+= res_lemma[i].text
+                    res1+=' '
                     
-        res[1] = res[1].split(' ')
+        '''res[1] = res[1].split(' ')
         res1 = ''
         for i in res[1]:
                 if i.lower().__contains__(mot):
                         i = '...'
                 res1+=i
                 res1+=' '
+        '''
         res = ['Voici une citation avec ce mot:', res[0],
                 res1[:-1]+'.', res[2], 'citation']
                     
@@ -126,8 +111,10 @@ def enigme(sous_action, bs, mot=None):
                 elif sous_action == 'locutions':
                         return locution(bs, mot)
                         
-                else:    
+                elif sous_action == 'citations':    
                         return citation(bs, mot)
+                else:
+                        return enigme_lettre()
 
         
         except AttributeError:
@@ -136,7 +123,7 @@ def enigme(sous_action, bs, mot=None):
 def make_request(mot, action, sous_action = None):
     '''make a request to the Larous dictionnary to get the definition
     of a word or a complement information'''
-
+    print(mot, type(mot))
     url = 'https://www.larousse.fr/dictionnaires/francais/' + mot
     #attention timeout 
     response = requests.get(url, timeout = 15)
@@ -156,12 +143,14 @@ def make_request(mot, action, sous_action = None):
                     except AttributeError:
                         print(definitions.text)
                         return [mot, '', definitions.text]
-                except IndexError:
-                    print(definitions.text)
+                #except IndexError:
+                except:
+                    #print(definitions.text)
                     return ["Oh! Ce mot est trop complique! On ne peut pas trouver sa definition.", 'error']
                 
             elif action == 'enigme':
-                actions = ['homonymes', 'locutions', 'citation']
+                actions = ['homonymes', 'locutions', 'citation', 'lettre']
+                #actions = ['homonymes', 'locutions', 'citation']
                 if sous_action == None:
                     #ca_marche = False
                     while len(actions)>=1:
@@ -196,51 +185,63 @@ def fermer_fenetre_def_eni_root(def_eni_root):
 def create_fenetre_def_eni_root(mot, action, sous_action = None):
     '''cree une fenetre qui affiche la definition
     ou l'enigme'''
+    global nlp
+
     try:
-        mot = nlp(mot)
-        mot = mot[0].lemma_
+         mot = mot.split()
+         mot = mot[1]
+         #print(mot, type(mot))
     except: pass
 
+    try:
+        mot = nlp(mot[0])
+        mot = mot[0].lemma_
+        #print(mot, type(mot))
+    except: pass
+
+    
+    print(mot, type(mot))
     res = make_request(mot, action, sous_action)
 
     def_eni_root = tk.Tk()
+    def_eni_root.config(bg ="#C0BCB5")
 
     if res[-1]=='error':
         def_eni_root.title('error')
-        t_text1 = tk.Label(def_eni_root, text = res[0])
+        t_text1 = tk.Label(def_eni_root, text = res[0], font=('Chalkduster',"10"), bg="#C0BCB5", fg="#404040")
 
     elif action == 'enigme':
 
         def_eni_root.title('enigme')
-        t_title = tk.Label(def_eni_root, text = 'Enigme')
+        t_title = tk.Label(def_eni_root, text = 'Enigme', font=('Chalkduster',"15"), bg="#C0BCB5", fg="#404040")
 
-        t_text1 = tk.Label(def_eni_root, text = res[0])
-        t_text2 = tk.Label(def_eni_root, text = res[1])
+        t_text1 = tk.Label(def_eni_root, text = res[0], font=('Chalkduster',"10"), bg="#C0BCB5")
+        t_text2 = tk.Label(def_eni_root, text = res[1], font=('Chalkduster',"10"), bg="#C0BCB5")
         
         if res[-1] == 'citation':
-            t_text3 = tk.Label(def_eni_root, text = res[2])
-            t_text4 = tk.Label(def_eni_root, text = res[3])
+            t_text3 = tk.Label(def_eni_root, text = res[2], font=('Chalkduster',"10"), bg="#C0BCB5")
+            t_text4 = tk.Label(def_eni_root, text = res[3], font=('Chalkduster',"10"), bg="#C0BCB5")
 
             t_text3.grid(row=3, column=1)
             t_text4.grid(row=4, column=1)
         
-        t_title.grid(row=0, column=0, columnspan = 2)
+        t_title.grid(row=0, column=0, columnspan = 2, padx = 10)
         t_text2.grid(row=2, column=1)
 
 
     else:
         def_eni_root.title('definition')
-        t_title = tk.Label(def_eni_root, text = res[0].capitalize())
-        t_text1 = tk.Label(def_eni_root, text = res[1])
-        t_text2 = tk.Label(def_eni_root, text = res[2])
+        t_title = tk.Label(def_eni_root, text = res[0].capitalize(), font=('Chalkduster',"15"), bg="#C0BCB5", fg="#404040")
+        t_text1 = tk.Label(def_eni_root, text = res[1], font=('Chalkduster',"10"), bg="#C0BCB5")
+        t_text2 = tk.Label(def_eni_root, text = res[2], font=('Chalkduster',"10"), bg="#C0BCB5")
 
-        t_title.grid(row=0, column=0, columnspan = 2)
+        t_title.grid(row=0, column=0, columnspan = 2, padx = 10)
         t_text2.grid(row=2, column=1)
         
     t_text1.grid(row=1, column=1)
 
     b_quitter = tk.Button(def_eni_root, text = 'Quitter', command = lambda: fermer_fenetre_def_eni_root(def_eni_root))
-    b_quitter.grid(column = 2, row = 5)
+    b_quitter.grid(column = 1, row = 6, padx = 5)
 
 
     def_eni_root.mainloop()
@@ -254,10 +255,17 @@ def choisir_sous_action(s_action):
     global sous_action
     sous_action = s_action
 
-def create_bouton_ask_eni(mot, ask_eni_root):
+def create_bouton_ask_eni(mot, ask_eni_root, image_to_lettre1, nlp1):
     '''Affiche le bouton qui affiche des enigmes et un bouton
     qui permet de choisir le type d'enigme '''
     global sous_action
+    global MOT
+    global image_to_lettre
+    global nlp
+
+    MOT = mot
+    image_to_lettre = image_to_lettre1
+    nlp = nlp1
     #ask_eni_root = tk.Tk()
 
     ask_eni_bouton = tk.Button(ask_eni_root, text='Enigme', command = lambda: create_fenetre_def_eni_root(mot, 'enigme', sous_action))
@@ -268,6 +276,7 @@ def create_bouton_ask_eni(mot, ask_eni_root):
     ask_eni_bouton1.menu.add_command(label = 'Homonyme', command = lambda : choisir_sous_action('homonymes'))
     ask_eni_bouton1.menu.add_command(label = 'Citation',  command = lambda : choisir_sous_action('citations'))
     ask_eni_bouton1.menu.add_command(label = 'Locution', command = lambda : choisir_sous_action('locutions'))
+    ask_eni_bouton1.menu.add_command(label = 'Lettre', command = lambda : choisir_sous_action('lettre'))
     ask_eni_bouton1.menu.add_command(label = 'Tout', command = lambda : choisir_sous_action(None))
 
     ask_eni_bouton.place(x = 450+(40*int(len(mot)/2))+50, y=445)
