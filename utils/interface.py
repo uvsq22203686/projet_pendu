@@ -1,17 +1,11 @@
-from bs4 import BeautifulSoup
-import requests
 from random import randint
 import tkinter as tk
-import pickle
-import os
 import gensim.downloader
-from googletrans import Translator
 from PIL import Image, ImageTk
 import sys
 from tkVideoPlayer import TkinterVideo
 import json
 import threading
-#
 import spacy
 
 sys.path.append('./utils')
@@ -24,6 +18,7 @@ current_nb_gagne = 0
 
 
 def generer_mot():
+    '''cree une fenetre avec des boutons qui permettent de choisir le mot'''
     global mot_par_classe, mot_par_len
     creer_mot.destroy()
     mot_par_len = tk.Button(debutjeu,text="Choisir le mot par longueur", command=choix_len)
@@ -32,6 +27,7 @@ def generer_mot():
     mot_par_classe.pack(pady =5)
 
 def debut(event):
+    '''cree la fenetre du debut du jeu'''
     global creer_mot
     global play
     global phrase
@@ -42,7 +38,6 @@ def debut(event):
     titre.config(font=('Chalkduster',"30"))
     creer_mot = tk.Button(debutjeu,text="Générer un mot", font=('Chalkduster',"15"), fg = "#5A5A5A",
                           command=generer_mot, relief = 'ridge')
-    #creer_mot.pack(fill ='y', side= 'top')
     creer_mot.place(x = 380, y = 290)
 
 def choix_len():
@@ -52,11 +47,12 @@ def choix_len():
     entry_len.bind("<Return>", config_len)
 
 def config_len(event):
+    '''permet de touver le mot par longueur'''
     global len_user
     global MOT
     global debutjeu
-    len_user = int(entry_len.get())
-    MOT = get_words_sorted_by_len(len_user)
+
+    MOT = get_words_sorted_by_len(entry_len.get())
     if MOT[-1]:
         t_alert = tk.Label(debutjeu, text=MOT[0])
         t_alert.pack(side = 'top')
@@ -72,6 +68,7 @@ def choix_classe():
     entry_classe.bind("<Return>",config_classe)
     
 def config_classe(event):
+    '''permet de trouver le mot par la categorie'''
     global class_user
     global debutjeu 
     global MOT
@@ -89,17 +86,20 @@ def config_classe(event):
         root_jeu()
 
 def fontionrecommencer(dico_joueurs_gagne):
+    '''recommence le jeu'''
+
     global jeu
     global racine
 
     json.dump(dico_joueurs_gagne, open("dico_joueurs_gagne.json","w"))
-
+    #sauvegarde le nombre de parties gagnees
 
     jeu.destroy()
     racine.destroy()
     root_debut_jeu()
 
 def gagne_perdu(gagne_perdu, mot = ''):
+    '''cree la fenetre quand le joueur a gagne ou perdu'''
     global racine
     global nom
     global current_nb_gagne
@@ -107,14 +107,12 @@ def gagne_perdu(gagne_perdu, mot = ''):
     with open('dico_joueurs_gagne.json', 'r') as f:
         dico_joueurs_gagne = json.load(f)
     
-
-
     racine = tk.Tk()
     racine.geometry("600x350")
+    racine.resizable(width=False, height=False) 
     
     if gagne_perdu:
 
-        print(list(dico_joueurs_gagne))
         if nom == "Current":
             current_nb_gagne += 1
             dico_joueurs_gagne["Current"] = current_nb_gagne
@@ -168,7 +166,7 @@ def destroy_root(root):
     root.destroy()
 
 def root_debut_jeu():
-    #fenetre debut de jeu 
+    '''fenetre debut de jeu '''
     global play
     global phrase
     global titre
@@ -178,6 +176,7 @@ def root_debut_jeu():
     debutjeu.title("Jeu du pendu")
     debutjeu.config(bg ="#C0BCB5")
     debutjeu.geometry("900x600")
+    debutjeu.resizable(width=False, height=False) 
 
     #création widgets accueil
     play = tk.Canvas(debutjeu, height=250, width=400, bg ="#C0BCB5", bd='0', highlightthickness=0)
@@ -196,16 +195,43 @@ def root_debut_jeu():
     play.bind("<Button-1>", debut)
     debutjeu.mainloop()
 
-def confirm_nom(event):  
+def new_nom(event):
+    '''permet de changer le joueur'''
     global joueur   
     global zone_nom
     global nom
 
-    nom = zone_nom.get()
+    try:
+        nom = 'Current'
+        joueur.configure(text = "Joueur : ")
+        zone_nom = tk.Entry(jeu)
+        zone_nom.place(x=60, y=3, anchor='nw')
+        zone_nom.bind("<Return>", confirm_nom)
+    except: pass
+
+def confirm_nom(event):  
+    '''permet de s'autentifier'''
+    global joueur   
+    global zone_nom
+    global nom
+
+    try:
+        nom = zone_nom.get()
+        joueur.configure(text = "Joueur : "+ nom)
+        zone_nom.destroy() 
+    except: pass
+
+def confirm_nom1():  
+    '''permet de s'autentifier lorsque le jeu recommence'''
+    global joueur   
+    global zone_nom
+    global nom
+
     joueur.configure(text = "Joueur : "+ nom)
     zone_nom.destroy() 
 
 def creer_croix(event):
+    '''barre la lettre choisi'''
     global jeu
     global canvas
     global lettre
@@ -217,8 +243,6 @@ def creer_croix(event):
     global videoplayer
     global mot_non_decouvert
     global image_to_lettre, mot_non_decouvert
-
-    #image_to_lettre = "éabcdefghjiklmnopqrstuvwxyzàèêëîïöù- '"
 
     lettres_images = {'a':1, 'b':2, 'c':3, 'd':4, 'e':5, 'f':6, 'g':7,'h':8, 'i':10, 'j':9, 'k':11, 'l':12,\
                     'm':13, 'n':14, 'o':15, 'p':16, 'q':17, 'r':18, 's':19, 't':20, 'u':21, 'v':22, 'w':23,\
@@ -234,11 +258,10 @@ def creer_croix(event):
     except:
         lettre = image_to_lettre[1]
         image_to_lettre[1] = '0'
-    #print(str(event.widget)[8:], lettre, lettres_images[lettre])
 
     if lettre not in MOT and lettre != '0':
         nb_errors += 1
-        videoplayer.load(f"../pendu_video/{str(nb_errors)}.mp4")
+        videoplayer.load(f"../pendu_video/{str(nb_errors)}.mp4") #play the video if lettre not in word
         videoplayer.play()
         if nb_errors == 14:
             for i in canvas:
@@ -247,14 +270,14 @@ def creer_croix(event):
             b_def = tk.Button(jeu, text = f'Definition du mot {MOT}', command = lambda: create_fenetre_def_eni_root(MOT, 'definition'))
             b_def.place(x = 400, y=530)
             gagne_perdu(0, MOT)
-    #else:
+
     elif lettre != '0':
         for i in range(len(MOT)):
             if MOT[i]==lettre:
                 lettre_inconnue[i]=ImageTk.PhotoImage(Image.open(f'./lettres/{str(lettres_images[lettre])}.png'))
                 c_mot[i].create_image(3,3, anchor = 'nw',image = lettre_inconnue[i])
                 mot_non_decouvert-=1
-                print(mot_non_decouvert)
+
         if mot_non_decouvert == 0:
             for i in canvas:
                 i.destroy()
@@ -318,7 +341,7 @@ def key(event):
         
 
 def root_jeu():
-    #fenetre de jeu 
+    '''fenetre de jeu'''
     global joueur
     global jeu
     global zone_nom
@@ -340,7 +363,10 @@ def root_jeu():
     jeu = tk.Tk()
     jeu.title("Jeu du pendu")
     jeu.config(bg ="#C0BCB5")
-    jeu.geometry("900x720") 
+    jeu.geometry("900x720")
+    jeu.resizable(width=False, height=False) 
+
+
     titre1=tk.Label(jeu, font=('Chalkduster',"30"), text="Le jeu du pendu", bg="#404040", fg="#C0BCB5")
     titre1.pack(side="top")
     
@@ -387,10 +413,16 @@ def root_jeu():
     #entrer informations du jeu
     zone_nom = tk.Entry(jeu)
     zone_nom.bind("<Return>", confirm_nom) 
-    joueur = tk.Label(jeu, text = "Joueur :") 
 
-    zone_nom.place(x=60, y=0, anchor='nw')
+
+    joueur = tk.Label(jeu, text = "Joueur :") 
+    joueur.bind("<Button-1>", new_nom) 
+
+    zone_nom.place(x=60, y=3, anchor='nw')
     joueur.place(x = 0, y =3, anchor='nw')
+
+    if nom != 'Current':
+        confirm_nom1()
 
     b_recommencer = tk.Button(jeu, text = 'Recommencer', command = lambda: recommencer(jeu), 
                           relief = 'ridge', bg = '#5C5C5C')
@@ -404,24 +436,27 @@ def root_jeu():
 
 
 
-
-
 def load_lib_nlp():
+    '''download dictionnaire francais de spacy'''
     global nlp
     nlp = spacy.load('fr_core_news_md') 
     return 0
 
 def load_lib_glove():
+    '''download wiki-gigaword-50 pour trouver les mots par categorie'''
     global dict_cat_word
     dict_cat_word = gensim.downloader.load('glove-wiki-gigaword-50')
     return 0
     
 def wait_load_lib():
+    '''fenetre avec slidebar permettant aux dictionnaires de se telecharger
+    avant aue le jeu commence'''
     global root
     root = tk.Tk()
     root.title('Pendu')
     root.config(bg ="#C0BCB5")
     root.geometry("600x400") 
+    root.resizable(width=False, height=False) 
 
     titre=tk.Label(root, font=('Chalkduster',"30"), text="Le jeu du pendu", bg="#C0BCB5", fg="#404040")
     titre.place(x = 150, y = 120)
