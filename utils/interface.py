@@ -243,21 +243,33 @@ def creer_croix(event):
     global videoplayer
     global mot_non_decouvert
     global image_to_lettre, mot_non_decouvert
-
+    
     lettres_images = {'a':1, 'b':2, 'c':3, 'd':4, 'e':5, 'f':6, 'g':7,'h':8, 'i':10, 'j':9, 'k':11, 'l':12,\
-                    'm':13, 'n':14, 'o':15, 'p':16, 'q':17, 'r':18, 's':19, 't':20, 'u':21, 'v':22, 'w':23,\
-                    'x':24, 'y':25, 'z':26, 'é':0, 'à':27, "è":28, "ê":29, "ë": 30, "î":31, "ï": 32,\
-                     "ö": 33, "ù":34, '-':35, ' ':36, "'":37}
-    #ù è ê  _
+                        'm':13, 'n':14, 'o':15, 'p':16, 'q':17, 'r':18, 's':19, 't':20, 'u':21, 'v':22, 'w':23,\
+                        'x':24, 'y':25, 'z':26, 'é':0, 'à':27, "è":28, "ê":29, "ë": 30, "î":31, "ï": 32,\
+                        "ö": 33, "ù":34, '-':35, ' ':36, "'":37}
+    
+    if event.widget == jeu : 
+        lettre = event.keysym
+        #rechercher la lettre dans les images sur le clavier de l'écran 
+        num = image_to_lettre.index(str(lettre)) -1
+        # créer la croix qui barre les lettres
+        canvas[num].create_line((0,51), (43, 0))
+        canvas[num].create_line((0,0), (43, 51))
+    else : 
+        #ù è ê  _
 
-    event.widget.create_line((0,51), (43, 0))
-    event.widget.create_line((0,0), (43, 51))
-    try:
-        lettre = image_to_lettre[int(str(event.widget)[8:])]
-        image_to_lettre[int(str(event.widget)[8:])] = '0'
-    except:
-        lettre = image_to_lettre[1]
-        image_to_lettre[1] = '0'
+        event.widget.create_line((0,51), (43, 0))
+        event.widget.create_line((0,0), (43, 51))
+        try:
+            lettre = image_to_lettre[int(str(event.widget)[8:])]
+            image_to_lettre[int(str(event.widget)[8:])] = '0'
+        except:
+            lettre = image_to_lettre[1]
+            image_to_lettre[1] = '0'
+        
+    
+        
 
     if lettre not in MOT and lettre != '0':
         nb_errors += 1
@@ -290,55 +302,7 @@ def creer_croix(event):
 def recommencer(jeu):
     jeu.destroy()
     root_debut_jeu()
-    
-def key(event):
-    global lettre
-    global lettres_images, mot_non_decouvert
-    global nb_errors
-    
-    lettres_images = {'a':1, 'b':2, 'c':3, 'd':4, 'e':5, 'f':6, 'g':7,'h':8, 'i':10, 'j':9, 'k':11, 'l':12,\
-                    'm':13, 'n':14, 'o':15, 'p':16, 'q':17, 'r':18, 's':19, 't':20, 'u':21, 'v':22, 'w':23,\
-                    'x':24, 'y':25, 'z':26, 'é':0, 'à':27, "è":28, "ê":29, "ë": 30, "î":31, "ï": 32,\
-                     "ö": 33, "ù":34, '-':35, ' ':36, "'":37}
-    #obtenir la lettre à partir du clavier de l'ordinateur 
-    lettre = event.keysym
-    print(lettre)
-    #rechercher la lettre dans les images sur le clavier de l'écran 
-    num = image_to_lettre.index(str(lettre)) -1
-    # créer la croix qui barre les lettres
-    canvas[num].create_line((0,51), (43, 0))
-    canvas[num].create_line((0,0), (43, 51))
-        
-    
-    if lettre not in MOT:
-        nb_errors += 1
-        videoplayer.load(f"../pendu_video/{str(nb_errors)}.mp4")
-        videoplayer.play()
-        if nb_errors == 14:
-            for i in canvas:
-                i.destroy()
-            jeu.geometry("900x600") 
-            b_def = tk.Button(jeu, text = f'Definition du mot {MOT}', command = lambda: create_fenetre_def_eni_root(MOT, 'definition'))
-            b_def.place(x = 400, y=530)
-            gagne_perdu(0, MOT)
-    #else:
-    elif lettre != '0':
-        for i in range(len(MOT)):
-            if MOT[i]==lettre:
-                lettre_inconnue[i]=ImageTk.PhotoImage(Image.open(f'./lettres/{str(lettres_images[lettre])}.png'))
-                c_mot[i].create_image(3,3, anchor = 'nw',image = lettre_inconnue[i])
-                mot_non_decouvert-=1
-                print(mot_non_decouvert)
-        if mot_non_decouvert == 0:
-            for i in canvas:
-                i.destroy()
-            jeu.geometry("900x600") 
-            b_def = tk.Button(jeu, text = f'Definition du mot {MOT}', 
-                              command = lambda: create_fenetre_def_eni_root(MOT, 'definition'))
-            b_def.place(x = 400, y=530)
-            gagne_perdu(1)
-    
-        
+      
 
 def root_jeu():
     '''fenetre de jeu'''
@@ -363,7 +327,7 @@ def root_jeu():
     jeu = tk.Tk()
     jeu.title("Jeu du pendu")
     jeu.config(bg ="#C0BCB5")
-    jeu.geometry("900x720")
+    jeu.geometry("950x720")
     jeu.resizable(width=False, height=False) 
 
 
@@ -379,7 +343,7 @@ def root_jeu():
         canvas[i].create_image(3,3,anchor = 'nw',image =lettre[i])
         canvas[i].bind('<Button-1>', creer_croix)
 
-    jeu.bind("<Key>", key)
+    jeu.bind("<Key>", creer_croix)
     
         
     #placement clavier
