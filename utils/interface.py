@@ -15,6 +15,7 @@ from enigmes import create_bouton_ask_eni, create_fenetre_def_eni_root
 
 nom = "Current"
 current_nb_gagne = 0
+nb_pas = 0
 
 
 def generer_mot():
@@ -90,6 +91,10 @@ def fontionrecommencer(dico_joueurs_gagne):
 
     global jeu
     global racine
+    global nb_pas
+
+    
+    dico_joueurs_gagne[nom][1].append(nb_pas)
 
     json.dump(dico_joueurs_gagne, open("dico_joueurs_gagne.json","w"))
     #sauvegarde le nombre de parties gagnees
@@ -103,9 +108,8 @@ def gagne_perdu(gagne_perdu, mot = ''):
     global racine
     global nom
     global current_nb_gagne
-
-    with open('dico_joueurs_gagne.json', 'r') as f:
-        dico_joueurs_gagne = json.load(f)
+    global nb_pas
+    global dico_joueurs_gagne
     
     racine = tk.Tk()
     racine.geometry("600x350")
@@ -115,11 +119,12 @@ def gagne_perdu(gagne_perdu, mot = ''):
 
         if nom == "Current":
             current_nb_gagne += 1
-            dico_joueurs_gagne["Current"] = current_nb_gagne
+            dico_joueurs_gagne["Current"][0] = current_nb_gagne
         elif nom not in list(dico_joueurs_gagne):
-            dico_joueurs_gagne[nom] = 1
+            dico_joueurs_gagne[nom] = [0, []]
+            dico_joueurs_gagne[nom][0] = 1
         else:
-            dico_joueurs_gagne[nom] += 1
+            dico_joueurs_gagne[nom][0] += 1
 
         racine.title("Gagne!")
         #changer le path!
@@ -134,9 +139,10 @@ def gagne_perdu(gagne_perdu, mot = ''):
     
     else:
         if nom == "Current":
-            dico_joueurs_gagne["Current"] = current_nb_gagne
+            dico_joueurs_gagne["Current"][0] = current_nb_gagne
         elif nom not in list(dico_joueurs_gagne):
-            dico_joueurs_gagne[nom] = 0
+            dico_joueurs_gagne[nom] = [0, []]
+            dico_joueurs_gagne[nom][0] = 0
 
         racine.title("Perdu")
         img= Image.open('../interface/rouge.png')
@@ -158,8 +164,12 @@ def gagne_perdu(gagne_perdu, mot = ''):
     restart1.place(x=130, y = 270)
 
     #nb victoires changer par la fonction
-    sessions = tk.Label(racine,text=f"Tu as gagné {dico_joueurs_gagne[nom]} sessions", font=("Arial", 10))
-    sessions.place(x = 450, y = 0)
+    sessions = tk.Label(racine,text=f"Tu as gagné {dico_joueurs_gagne[nom][0]} sessions", font=("Arial", 10))
+    sessions.place(x = 400, y = 0)
+
+    sessions1 = tk.Label(racine,text=f"Durant ce jeu tu as utilise {nb_pas} tentatives", font=("Arial", 10))
+    sessions1.place(x = 350, y = 22)
+
     racine.mainloop()
 
 def destroy_root(root):
@@ -241,6 +251,11 @@ def creer_croix(event):
     global videoplayer
     global mot_non_decouvert
     global image_to_lettre
+    global nb_pas
+    global l_tentatives
+    global b_quitter
+    global dico_joueurs_gagne
+    nb_pas += 1
 
     lettres_images = {'a':1, 'b':2, 'c':3, 'd':4, 'e':5, 'f':6, 'g':7,'h':8, 'i':10, 'j':9, 'k':11, 'l':12,\
                     'm':13, 'n':14, 'o':15, 'p':16, 'q':17, 'r':18, 's':19, 't':20, 'u':21, 'v':22, 'w':23,\
@@ -259,6 +274,7 @@ def creer_croix(event):
 
     if lettre not in MOT and lettre != '0':
         nb_errors += 1
+        l_tentatives.config(text=f'Il te reste {14-nb_errors} tentatives.')
         videoplayer.load(f"../pendu_video/{str(nb_errors)}.mp4") #play the video if lettre not in word
         videoplayer.play()
         if nb_errors == 14:
@@ -267,6 +283,7 @@ def creer_croix(event):
             jeu.geometry("900x600") 
             b_def = tk.Button(jeu, text = f'Definition du mot {MOT}', command = lambda: create_fenetre_def_eni_root(MOT, 'definition'))
             b_def.place(x = 400, y=530)
+            b_quitter.config(command=lambda: fontionrecommencer(dico_joueurs_gagne))
             gagne_perdu(0, MOT)
 
     elif lettre != '0':
@@ -283,6 +300,7 @@ def creer_croix(event):
             b_def = tk.Button(jeu, text = f'Definition du mot {MOT}', 
                               command = lambda: create_fenetre_def_eni_root(MOT, 'definition'))
             b_def.place(x = 400, y=530)
+            b_quitter.config(command=lambda: fontionrecommencer(dico_joueurs_gagne))
             gagne_perdu(1)
 
 def recommencer(jeu):
@@ -302,9 +320,14 @@ def root_jeu():
     global MOT
     global mot_non_decouvert
     global image_to_lettre
+    global l_tentatives
+    global b_quitter
+    global dico_joueurs_gagne
 
     nb_errors = 0
     mot_non_decouvert = len(MOT)
+    with open('dico_joueurs_gagne.json', 'r') as f:
+        dico_joueurs_gagne = json.load(f)
 
     image_to_lettre = ['0','é', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'j','i', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's',
                         't', 'u', 'v', 'w', 'x', 'y', 'z', 'à', 'è', 'ê', 'ë', 'î', 'ï', 'ö', 'ù', '-', ' ', "'"]
@@ -378,9 +401,36 @@ def root_jeu():
                           relief = 'ridge', bg = '#5C5C5C')
     b_quitter.place(x = 820, y =50)
 
+    l_tentatives = tk.Label(jeu, text = f'Il te reste 14 tentatives',font=('Chalkduster',"10"), bg="#C0BCB5", fg="#404040")
+    l_tentatives.place(x = 720, y =260)
+
     jeu.mainloop()
 
+def root_score():
+    '''
+    global nom
+    global dico_joueurs_gagne
 
+    root = tk.Tk()
+    root.title('Pendu- Score')
+    root.config(bg ="#C0BCB5")
+    root.geometry("600x400") 
+    root.resizable(width=False, height=False) 
+
+    titre=tk.Label(root, font=('Chalkduster',"30"), text="Score de {nom}", bg="#C0BCB5", fg="#404040")
+    titre.place(x = 150, y = 120)
+    
+    
+    l_nb_gains = tk.Label(root,text = f'Vous avez gagne {dico_joueurs_gagne[nom][0]} parties', font=('Chalkduster',"20"),bg="#C0BCB5", fg="#404040")
+    nb_pas_moyen = 0
+    l_nb_pas = []
+    while i < 8:
+
+    #tk.Label(root,text = f'Vous avez gagne {dico_joueurs_gagne[nom][0]} parties', font=('Chalkduster',"20"),bg="#C0BCB5", fg="#404040")
+    
+    #l_attendre.place(x = 210, y = 200)
+    #s_attendre.place(x = 190, y = 250)
+    '''
 
 def load_lib_nlp():
     '''download dictionnaire francais de spacy'''
@@ -397,7 +447,7 @@ def load_lib_glove():
 def wait_load_lib():
     '''fenetre avec slidebar permettant aux dictionnaires de se telecharger
     avant aue le jeu commence'''
-    global root
+    #global root
     root = tk.Tk()
     root.title('Pendu')
     root.config(bg ="#C0BCB5")
