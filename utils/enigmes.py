@@ -251,7 +251,7 @@ def create_bouton_ask_eni(mot, ask_eni_root, image_to_lettre1, nlp1):
     ask_eni_bouton1.menu.add_command(label = 'Tout', command = lambda : choisir_sous_action(None))
 
     ask_eni_bouton.place(x = 450+(40*int(len(mot)/2))+50, y=445)
-    ask_eni_bouton1.place(x = 450+(40*int(len(mot)/2))+50, y=465)
+    ask_eni_bouton1.place(x = 450+(40*int(len(mot)/2))+50, y=475)
 
 
 

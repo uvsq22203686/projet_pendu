@@ -21,9 +21,9 @@ def generer_mot():
     '''cree une fenetre avec des boutons qui permettent de choisir le mot'''
     global mot_par_classe, mot_par_len
     creer_mot.destroy()
-    mot_par_len = tk.Button(debutjeu,text="Choisir le mot par longueur", command=choix_len)
+    mot_par_len = tk.Button(debutjeu,text="Choisir le mot par longueur",font=('Chalkduster',"15"), command=choix_len)
     mot_par_len.pack(pady=5)
-    mot_par_classe = tk.Button(debutjeu, text="Choisir par catégorie", command=choix_classe)
+    mot_par_classe = tk.Button(debutjeu, text="Choisir par catégorie",font=('Chalkduster',"15"), command=choix_classe)
     mot_par_classe.pack(pady =5)
 
 def debut(event):
@@ -42,10 +42,19 @@ def debut(event):
 
 def choix_len():
     global entry_len
-    entry_len = tk.Entry(debutjeu)
+    global donner_len
+    try : 
+            entry_classe.destroy()
+            donner_categorie.destroy()
+            #entry_len = tk.Entry(debutjeu) 
+    except NameError :
+        None
+    entry_len = tk.Entry(debutjeu)   
+    donner_len = tk.Label(debutjeu, text='Longueur ?',font=('Chalkduster',"15"))  
     entry_len.pack(side='bottom')
-    entry_len.bind("<Return>", config_len)
-
+    donner_len.pack(side='bottom')
+    entry_len.bind("<Return>", config_len) 
+    
 def config_len(event):
     '''permet de touver le mot par longueur'''
     global len_user
@@ -63,8 +72,16 @@ def config_len(event):
 
 def choix_classe():
     global entry_classe
+    global donner_categorie
+    try : 
+        entry_len.destroy()
+        donner_len.destroy()
+    except NameError : 
+        None
     entry_classe = tk.Entry(debutjeu)
+    donner_categorie = tk.Label(debutjeu,text="Catégorie ?",font=('Chalkduster',"15"))
     entry_classe.pack(side = 'bottom')
+    donner_categorie.pack(side='bottom')
     entry_classe.bind("<Return>",config_classe)
     
 def config_classe(event):
@@ -175,7 +192,7 @@ def root_debut_jeu():
     debutjeu = tk.Tk()
     debutjeu.title("Jeu du pendu")
     debutjeu.config(bg ="#C0BCB5")
-    debutjeu.geometry("900x600")
+    debutjeu.geometry("950x720")
     debutjeu.resizable(width=False, height=False) 
 
     #création widgets accueil
