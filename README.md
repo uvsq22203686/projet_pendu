@@ -24,7 +24,7 @@ car on devra de nouveau telecarger les dictionnaires avec les mots et ca prend d
 
 
 Information d'instalation
-- N'oublies pas d'installer toutes les libraries necessaires pour pouvoir jouer.
+- N'oublies pas d'installer toutes les libraries necessaires pour pouvoir jouer. $ pip install -r requiremets.txt
 - On utilise le spacy lemmanizer , pour cela merci d'installer $ python -m spacy download fr_core_news_md
 
 
