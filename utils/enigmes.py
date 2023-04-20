@@ -240,7 +240,7 @@ def create_bouton_ask_eni(mot, ask_eni_root, image_to_lettre1, nlp1):
     nlp = nlp1
 
     ask_eni_bouton = tk.Button(ask_eni_root, text='Enigme', command = lambda: create_fenetre_def_eni_root(mot, 'enigme', sous_action))
-    ask_eni_bouton1 =  tk.Menubutton(ask_eni_root, text = "Choisir le type d'enigme", relief = 'ridge',fg='white', bg='green' )
+    ask_eni_bouton1 =  tk.Menubutton(ask_eni_root, text = "Choisir le type d'enigme", relief = 'ridge',fg='white', bg='#5A5A5A' )
     ask_eni_bouton1.menu = tk.Menu(ask_eni_bouton1, tearoff = 0 )
     ask_eni_bouton1["menu"] =  ask_eni_bouton1.menu
 
@@ -251,7 +251,7 @@ def create_bouton_ask_eni(mot, ask_eni_root, image_to_lettre1, nlp1):
     ask_eni_bouton1.menu.add_command(label = 'Tout', command = lambda : choisir_sous_action(None))
 
     ask_eni_bouton.place(x = 450+(40*int(len(mot)/2))+50, y=445)
-    ask_eni_bouton1.place(x = 450+(40*int(len(mot)/2))+50, y=465)
+    ask_eni_bouton1.place(x = 450+(40*int(len(mot)/2))+50, y=475)
 
 
 
