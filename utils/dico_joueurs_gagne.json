@@ -1,5 +1,1 @@
-<<<<<<< HEAD
-{"Current": 1}
-=======
-{"Current": [1, [["", 3]]], "aaa": [3, [["rue", 5], ["pomme", 14], ["ong", 4]]]}
->>>>>>> 621e64d7b34b3592810cbcac9b0b2af8b0e653cd
+{"Current": [1, [["ci", 14], ["bu", 5]]], "aaa": [5, [["rue", 5], ["pomme", 14], ["ong", 4], ["r\u00e9", 2], ["des oiseaux", 10], ["las", 12], ["inintelligible", 14]]]}
