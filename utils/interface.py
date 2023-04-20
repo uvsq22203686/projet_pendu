@@ -629,7 +629,3 @@ def wait_load_lib():
 
 wait_load_lib()
 root_debut_jeu()
-
-
-
-
