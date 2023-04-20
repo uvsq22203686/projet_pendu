@@ -671,15 +671,18 @@ def confirm_nom1(event):
         if zone_nom1.get() != '':
             nom = zone_nom1.get()
         joueur1.configure(text = "Joueur : "+ nom)
-        zone_nom1.destroy() 
-        l_error.destroy()
+        for widget in root.winfo_children():
+            if widget != joueur1:
+                widget.destroy()
         get_score()
     except: pass
 
 
 def duration(event):
+
     '''stoppe la video avec le pendu 
     a une duree determinee a partir du nombre de tentatives possibles'''
+
     global nb_err_dispo
     global i_err
     global i_err2
@@ -936,8 +939,8 @@ def get_score():
                          bg = "#C0BCB5", fg = "#404040", pady = 20)
         titre.pack(side = 'top')
             
-        l_nb_gains = tk.Label(root,text = f'Vous avez gagne {dico_joueurs_gagne[nom][0]}\
-                             parties', font = ('Chalkduster',"20"),bg = "#C0BCB5", fg = "#404040",pady = 10)
+        l_nb_gains = tk.Label(root,text = f'Vous avez gagne {dico_joueurs_gagne[nom][0]} parties', 
+                              font = ('Chalkduster',"20"),bg = "#C0BCB5", fg = "#404040",pady = 10)
                                 
             
         nb_pas_moyen = 0
@@ -945,8 +948,8 @@ def get_score():
         i = 0
         while i < 5:
             try:
-                l_nb_pas.append(tk.Label(root, text = f'mot "{dico_joueurs_gagne[nom][1][-(i+1)][0]}": \
-                    {dico_joueurs_gagne[nom][1][-(i+1)][1]} pas',font = ('Chalkduster',"10"),
+                l_nb_pas.append(tk.Label(root, text = f'mot "{dico_joueurs_gagne[nom][1][-(i+1)][0]}":' +
+                    f'{dico_joueurs_gagne[nom][1][-(i+1)][1]} pas',font = ('Chalkduster',"10"),
                     bg = "#C0BCB5", fg = "#404040", padx = 40))
                                 
                 nb_pas_moyen += dico_joueurs_gagne[nom][1][-(i+1)][1]
@@ -956,8 +959,8 @@ def get_score():
         l_nb_gains.pack(side = 'top')
 
         try:
-            l_nb_moyen_gains = tk.Label(root,text = f'Votre nombre moyen de tentatives est \
-                {int(nb_pas_moyen/i)} ', font = ('Chalkduster',"15"),bg = "#C0BCB5", 
+            l_nb_moyen_gains = tk.Label(root,text = f'Votre nombre moyen de tentatives est ' +
+                f'{int(nb_pas_moyen/i)} ', font = ('Chalkduster',"15"),bg = "#C0BCB5", 
                 fg = "#404040", pady = 15)
                                             
             l_nb_moyen_gains.pack(side = 'top')
@@ -970,8 +973,8 @@ def get_score():
         for i in range(len(l_nb_pas)):
             l_nb_pas[i].pack(side = 'top')
     else:
-            l_error = tk.Label(root, text = 'Vous devez finir au moins \
-                une partie pour voir le score')
+            l_error = tk.Label(root, text = 'Vous devez finir au moins '+
+                'une partie pour voir le score')
             l_error.place(x = 150, y = 200)
            
            
