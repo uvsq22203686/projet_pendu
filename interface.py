@@ -562,7 +562,7 @@ def gagne_perdu(gagne_perdu, mot = ''):
     
 
     dico_joueurs_gagne[nom][1].append([mot,nb_pas])
-    json.dump(dico_joueurs_gagne, open("dico_joueurs_gagne.json","w"))
+    json.dump(dico_joueurs_gagne, open("./utils/dico_joueurs_gagne.json","w"))
 
     racine.mainloop()
 
@@ -671,9 +671,6 @@ def confirm_nom1(event):
         if zone_nom1.get() != '':
             nom = zone_nom1.get()
         joueur1.configure(text = "Joueur : "+ nom)
-        for widget in root.winfo_children():
-            if widget != joueur1:
-                widget.destroy()
         get_score()
     except: pass
 
@@ -933,6 +930,12 @@ def get_score():
     global nom
     global dico_joueurs_gagne
     global l_error
+    global zone_nom1
+    global joueur1
+
+    for widget in root.winfo_children():
+        if widget != joueur1:
+            widget.destroy()
 
     if nom in list(dico_joueurs_gagne):
         titre = tk.Label(root, font = ('Chalkduster',"30"), text = f"Score de {nom}", 
@@ -997,7 +1000,7 @@ def root_score():
     root.resizable(width = False, height = False) 
 
     if dico_joueurs_gagne == None:
-        with open('dico_joueurs_gagne.json', 'r') as f:
+        with open('./utils/dico_joueurs_gagne.json', 'r') as f:
             dico_joueurs_gagne = json.load(f)
 
     zone_nom1 = tk.Entry(root)
