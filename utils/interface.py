@@ -111,21 +111,6 @@ def config_classe(event):
         debutjeu.destroy()
         root_jeu()
 
-<<<<<<< HEAD
-
-def fontionrecommencer(dico_joueurs_gagne):
-    '''recommence le jeu'''
-    global jeu
-    global racine
-
-    json.dump(dico_joueurs_gagne, open("dico_joueurs_gagne.json","w"))
-    #sauvegarde le nombre de parties gagnees
-
-    jeu.destroy()
-    racine.destroy()
-    root_debut_jeu()
-=======
->>>>>>> 621e64d7b34b3592810cbcac9b0b2af8b0e653cd
 
 
 def gagne_perdu(gagne_perdu, mot = ''):
@@ -183,18 +168,6 @@ def gagne_perdu(gagne_perdu, mot = ''):
         perdu.place(anchor = 'center', x = 285, y = 160)
 
     #boutons
-<<<<<<< HEAD
-    restart2 = tk.Button(racine, text = "Recommencer une partie à plusieurs joueurs ",
-                          command = lambda: fontionrecommencer(dico_joueurs_gagne),font = ("Chalkduster", 15),highlightthickness = 0)#mettre le code en comman
-    restart2.place(anchor = 'center', x = 300, y = 240)
-    restart1 = tk.Button(racine, text = "Recommencer une partie à 1 joueur",
-                          command = lambda: fontionrecommencer(dico_joueurs_gagne),font = ("Chalkduster", 15),highlightthickness = 0) 
-    restart1.place(anchor='center', x = 300, y = 280)
-
-    #nb victoires changer par la fonction
-    sessions = tk.Label(racine,text = f"Tu as gagné {dico_joueurs_gagne[nom]} sessions", font = ("Chalkduster", 12))
-    sessions.place(x = 430, y = 0)
-=======
     restart2 = tk.Button(racine, text="Recommencer une partie à plusieurs joueurs ",
                          command = recommencer,font=("Arial", 15))
                           #command = lambda: fontionrecommencer(dico_joueurs_gagne),font=("Arial", 15))#mettre le code en comman
@@ -215,7 +188,6 @@ def gagne_perdu(gagne_perdu, mot = ''):
     dico_joueurs_gagne[nom][1].append([mot,nb_pas])
     json.dump(dico_joueurs_gagne, open("dico_joueurs_gagne.json","w"))
 
->>>>>>> 621e64d7b34b3592810cbcac9b0b2af8b0e653cd
     racine.mainloop()
 
 
@@ -277,8 +249,6 @@ def new_nom(event):
         zone_nom.bind("<Return>", confirm_nom)
     except: pass
 
-<<<<<<< HEAD
-=======
 def new_nom1(event):
     '''permet de changer le joueur'''
     global joueur1
@@ -293,7 +263,6 @@ def new_nom1(event):
         zone_nom1.place(x=60, y=3, anchor='nw')
         zone_nom1.bind("<Return>", confirm_nom1)
     except: pass
->>>>>>> 621e64d7b34b3592810cbcac9b0b2af8b0e653cd
 
 def confirm_nom(event):  
     '''permet de s'autentifier'''
@@ -309,18 +278,10 @@ def confirm_nom(event):
         zone_nom.destroy() 
     except: pass
 
-<<<<<<< HEAD
-
-def confirm_nom1():  
-    '''permet de s'autentifier lorsque le jeu recommence'''
-    global joueur   
-    global zone_nom
-=======
 def confirm_nom1(event):  
     '''permet de s'autentifier'''
     global joueur1  
     global zone_nom1
->>>>>>> 621e64d7b34b3592810cbcac9b0b2af8b0e653cd
     global nom
     global root
     global l_error
@@ -334,11 +295,6 @@ def confirm_nom1(event):
         get_score()
     except: pass
 
-<<<<<<< HEAD
-    joueur.configure(text = "Joueur : " + nom)
-    zone_nom.destroy() 
-=======
->>>>>>> 621e64d7b34b3592810cbcac9b0b2af8b0e653cd
 
 
 def creer_croix(event):
@@ -353,17 +309,12 @@ def creer_croix(event):
     global nb_errors
     global videoplayer
     global mot_non_decouvert
-<<<<<<< HEAD
-    global image_to_lettre, mot_non_decouvert
-    
-=======
     global image_to_lettre
     global nb_pas
     global l_tentatives
     global dico_joueurs_gagne
     nb_pas += 1
 
->>>>>>> 621e64d7b34b3592810cbcac9b0b2af8b0e653cd
     lettres_images = {'a':1, 'b':2, 'c':3, 'd':4, 'e':5, 'f':6, 'g':7,'h':8, 'i':10, 'j':9, 'k':11, 'l':12,\
                         'm':13, 'n':14, 'o':15, 'p':16, 'q':17, 'r':18, 's':19, 't':20, 'u':21, 'v':22, 'w':23,\
                         'x':24, 'y':25, 'z':26, 'é':0, 'à':27, "è":28, "ê":29, "ë": 30, "î":31, "ï": 32,\
@@ -415,14 +366,6 @@ def creer_croix(event):
             jeu.geometry("900x600") 
             b_def = tk.Button(jeu, text = f'Definition du mot {MOT}', 
                               command = lambda: create_fenetre_def_eni_root(MOT, 'definition'))
-<<<<<<< HEAD
-            b_def.place(x = 400, y = 530)
-            gagne_perdu(1)
-
-
-def recommencer(jeu):
-    jeu.destroy()
-=======
             b_def.place(x = 400, y=530)
             gagne_perdu(1, MOT)
 
@@ -436,7 +379,6 @@ def recommencer():
     except:
         jeu.destroy()
 
->>>>>>> 621e64d7b34b3592810cbcac9b0b2af8b0e653cd
     root_debut_jeu()
       
 
