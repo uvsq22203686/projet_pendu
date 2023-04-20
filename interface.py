@@ -91,6 +91,7 @@ def citation(bs, mot):
         return res
 
 def enigme(sous_action, bs, mot=None):
+        '''appelle la fonction de la bonne sous action'''
         try:
                 if sous_action == 'homonymes':
                         return homonyme(bs)
@@ -371,6 +372,7 @@ def debut(event):
     creer_mot.place(x = 380, y = 290)
 
 def choix_len():
+    '''cree un widget aui permet de choisir la longeur du mot'''
     global entry_len
     global donner_len
     global entry_classe
@@ -406,6 +408,7 @@ def config_len(event):
         root_jeu()
 
 def choix_classe():
+    '''cree un widget aui permet de choisir la categorie du mot'''
     global entry_classe
     global donner_categorie
     global entry_classe
@@ -470,14 +473,12 @@ def gagne_perdu(gagne_perdu, mot = ''):
 
         racine.title("Gagne!")
         racine.configure(bg = "#C0BCB5")
-        #changer le path!
         img= Image.open('./interface/CONFETTIS 2.png')
         img = img.resize((600, 350))
         img = ImageTk.PhotoImage(img, master = racine)
         label = tk.Label(racine, image = img)
         label.place(x=0, y=0)
         gagne=tk.Label(racine, text = "Félicitations vous avez gagné !",font = ("Chalkduster", 25))
-        #gagne.place(x = 75, y = 130)
         gagne.place(anchor = 'center', x = 300, y = 175)
         sessions = tk.Label(racine,text=f"Tu as gagné {dico_joueurs_gagne[nom][0]} sessions",
                              font=("Chalkduster", 10))
@@ -520,8 +521,6 @@ def gagne_perdu(gagne_perdu, mot = ''):
     #boutons
     restart1 = tk.Button(racine, text="Recommencer une partie ", relief = 'ridge', bg = '#5C5C5C',
                          command = recommencer,font = ("Chalkduster", 10), highlightthickness = 0)
-                          #command = lambda: fontionrecommencer(dico_joueurs_gagne),font=("Arial", 15))#mettre le code en comman
-    #restart2.place(x=125, y = 210)
     restart1.place(anchor = 'center', x = 300, y = 240)
     b_quitter = tk.Button(racine, text = 'Quitter', command = lambda: destroy_root(racine), 
                           relief = 'ridge', bg = '#5C5C5C')
@@ -534,6 +533,7 @@ def gagne_perdu(gagne_perdu, mot = ''):
     racine.mainloop()
 
 def destroy_root(root):
+    '''detriot la fenetre'''
     root.destroy()
 
 def root_debut_jeu():
@@ -587,7 +587,7 @@ def new_nom(event):
     except: pass
 
 def new_nom1(event):
-    '''permet de changer le joueur'''
+    '''permet de changer le joueur pour savoir le score'''
     global joueur1
     global zone_nom1
     global nom
@@ -615,7 +615,7 @@ def confirm_nom(event):
     except: pass
 
 def confirm_nom1(event):  
-    '''permet de s'autentifier'''
+    '''permet de s'autentifier pour savoir le score'''
     global joueur1  
     global zone_nom1
     global nom
@@ -632,6 +632,8 @@ def confirm_nom1(event):
     except: pass
 
 def duration(event):
+    '''stoppe la video avec le pendu 
+    a une duree determinee a partir du nombre de tentatives possibles'''
     global nb_err_dispo
     global i_err
     global i_err2
@@ -641,7 +643,6 @@ def duration(event):
                  6:[3, 1, 1, 1, 1, 2], 7:[2, 1, 1, 1, 1, 1, 2], 
                  8:[2, 1, 1, 1, 1, 1, 1, 1]}
     
-    dur = videoplayer.current_duration()
     if i_err2%decoupage[nb_err_dispo][i_err] == 0:
         videoplayer.pause()
         i_err += 1
@@ -702,7 +703,6 @@ def creer_croix(event):
         except:
             lettre = image_to_lettre[1]
             image_to_lettre[1] = '0'
-    print(lettre)
     try:
         if lettre not in MOT and lettre != '0':
             nb_errors += 1
@@ -738,6 +738,8 @@ def creer_croix(event):
     except UnboundLocalError: pass
 
 def recommencer():
+    '''permet de recommencer le jeu meme si le jeu n'est pas encore
+    termine'''
     global jeu
     
     try:
@@ -822,6 +824,8 @@ def root_jeu():
     
     #enigme
     create_bouton_ask_eni(MOT, jeu, image_to_lettre, nlp)
+
+    #affiche le mot dans le terminal
     print(MOT)
 
 
@@ -858,7 +862,10 @@ def root_jeu():
     jeu.mainloop()
 
 def get_score():
-        
+
+    '''calcule l'efficacite du joueur pour la mettre dans le fenetre afficheant 
+    le score du joueur'''
+
     global root
     global nom
     global dico_joueurs_gagne
@@ -901,6 +908,9 @@ def get_score():
             l_error.place(x=150, y=200)
            
 def root_score():
+
+    '''cree le fenetre qui permet de voir le score du joueur'''
+
     global nom
     global dico_joueurs_gagne
     global root
@@ -958,7 +968,6 @@ def load_lib_glove():
 def wait_load_lib():
     '''fenetre avec slidebar permettant aux dictionnaires de se telecharger
     avant que le jeu commence'''
-    #global root
     root = tk.Tk()
     root.title('Pendu')
     root.config(bg ="#C0BCB5")
