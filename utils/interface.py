@@ -15,6 +15,7 @@ from enigmes import create_bouton_ask_eni, create_fenetre_def_eni_root
 
 nom = "Current"
 current_nb_gagne = 0
+dico_joueurs_gagne = None
 
 
 def generer_mot():
@@ -110,6 +111,7 @@ def config_classe(event):
         debutjeu.destroy()
         root_jeu()
 
+<<<<<<< HEAD
 
 def fontionrecommencer(dico_joueurs_gagne):
     '''recommence le jeu'''
@@ -122,6 +124,8 @@ def fontionrecommencer(dico_joueurs_gagne):
     jeu.destroy()
     racine.destroy()
     root_debut_jeu()
+=======
+>>>>>>> 621e64d7b34b3592810cbcac9b0b2af8b0e653cd
 
 
 def gagne_perdu(gagne_perdu, mot = ''):
@@ -129,9 +133,8 @@ def gagne_perdu(gagne_perdu, mot = ''):
     global racine
     global nom
     global current_nb_gagne
-
-    with open('dico_joueurs_gagne.json', 'r') as f:
-        dico_joueurs_gagne = json.load(f)
+    global nb_pas
+    global dico_joueurs_gagne
     
     racine = tk.Tk()
     racine.geometry("600x350")
@@ -141,11 +144,12 @@ def gagne_perdu(gagne_perdu, mot = ''):
 
         if nom == "Current":
             current_nb_gagne += 1
-            dico_joueurs_gagne["Current"] = current_nb_gagne
+            dico_joueurs_gagne["Current"][0] = current_nb_gagne
         elif nom not in list(dico_joueurs_gagne):
-            dico_joueurs_gagne[nom] = 1
+            dico_joueurs_gagne[nom] = [0, []]
+            dico_joueurs_gagne[nom][0] = 1
         else:
-            dico_joueurs_gagne[nom] += 1
+            dico_joueurs_gagne[nom][0] += 1
 
         racine.title("Gagne!")
         #changer le path!
@@ -161,9 +165,10 @@ def gagne_perdu(gagne_perdu, mot = ''):
     
     else:
         if nom == "Current":
-            dico_joueurs_gagne["Current"] = current_nb_gagne
+            dico_joueurs_gagne["Current"][0] = current_nb_gagne
         elif nom not in list(dico_joueurs_gagne):
-            dico_joueurs_gagne[nom] = 0
+            dico_joueurs_gagne[nom] = [0, []]
+            dico_joueurs_gagne[nom][0] = 0
 
         racine.title("Perdu")
         img= Image.open('../interface/corde1.png')
@@ -178,6 +183,7 @@ def gagne_perdu(gagne_perdu, mot = ''):
         perdu.place(anchor = 'center', x = 285, y = 160)
 
     #boutons
+<<<<<<< HEAD
     restart2 = tk.Button(racine, text = "Recommencer une partie à plusieurs joueurs ",
                           command = lambda: fontionrecommencer(dico_joueurs_gagne),font = ("Chalkduster", 15),highlightthickness = 0)#mettre le code en comman
     restart2.place(anchor = 'center', x = 300, y = 240)
@@ -188,6 +194,28 @@ def gagne_perdu(gagne_perdu, mot = ''):
     #nb victoires changer par la fonction
     sessions = tk.Label(racine,text = f"Tu as gagné {dico_joueurs_gagne[nom]} sessions", font = ("Chalkduster", 12))
     sessions.place(x = 430, y = 0)
+=======
+    restart2 = tk.Button(racine, text="Recommencer une partie à plusieurs joueurs ",
+                         command = recommencer,font=("Arial", 15))
+                          #command = lambda: fontionrecommencer(dico_joueurs_gagne),font=("Arial", 15))#mettre le code en comman
+    restart2.place(x=125, y = 210)
+    restart1 = tk.Button(racine, text="Recommencer une partie à 1 joueur",
+                          command = recommencer,font=("Arial", 15)) 
+    restart1.place(x=130, y = 270)
+
+    #nb victoires changer par la fonction
+    sessions = tk.Label(racine,text=f"Tu as gagné {dico_joueurs_gagne[nom][0]} sessions", font=("Arial", 10))
+    sessions.place(x = 400, y = 0)
+
+    sessions1 = tk.Label(racine,text=f"Durant ce jeu tu as utilise {nb_pas} tentatives", font=("Arial", 10))
+    sessions1.place(x = 350, y = 22)
+
+    
+
+    dico_joueurs_gagne[nom][1].append([mot,nb_pas])
+    json.dump(dico_joueurs_gagne, open("dico_joueurs_gagne.json","w"))
+
+>>>>>>> 621e64d7b34b3592810cbcac9b0b2af8b0e653cd
     racine.mainloop()
 
 
@@ -226,6 +254,11 @@ def root_debut_jeu():
     b_quitter.pack(side = 'bottom', pady = 15)
 
     play.bind("<Button-1>", debut)
+
+    b_score = tk.Button(debutjeu, text = 'Score', command = root_score, 
+                          relief = 'ridge', bg = '#5C5C5C')
+    b_score.pack(side = 'bottom')
+
     debutjeu.mainloop()
 
 
@@ -234,6 +267,7 @@ def new_nom(event):
     global joueur   
     global zone_nom
     global nom
+    global jeu
 
     try:
         nom = 'Current'
@@ -243,6 +277,23 @@ def new_nom(event):
         zone_nom.bind("<Return>", confirm_nom)
     except: pass
 
+<<<<<<< HEAD
+=======
+def new_nom1(event):
+    '''permet de changer le joueur'''
+    global joueur1
+    global zone_nom1
+    global nom
+    global root
+
+    try:
+        nom = 'Current'
+        joueur1.configure(text = "Joueur : ")
+        zone_nom1 = tk.Entry(root)
+        zone_nom1.place(x=60, y=3, anchor='nw')
+        zone_nom1.bind("<Return>", confirm_nom1)
+    except: pass
+>>>>>>> 621e64d7b34b3592810cbcac9b0b2af8b0e653cd
 
 def confirm_nom(event):  
     '''permet de s'autentifier'''
@@ -251,20 +302,43 @@ def confirm_nom(event):
     global nom
 
     try:
+        if zone_nom.get() != '':
+            nom = zone_nom.get()
         nom = zone_nom.get()
         joueur.configure(text = "Joueur : " + nom)
         zone_nom.destroy() 
     except: pass
 
+<<<<<<< HEAD
 
 def confirm_nom1():  
     '''permet de s'autentifier lorsque le jeu recommence'''
     global joueur   
     global zone_nom
+=======
+def confirm_nom1(event):  
+    '''permet de s'autentifier'''
+    global joueur1  
+    global zone_nom1
+>>>>>>> 621e64d7b34b3592810cbcac9b0b2af8b0e653cd
     global nom
+    global root
+    global l_error
 
+    try:
+        if zone_nom1.get() != '':
+            nom = zone_nom1.get()
+        joueur1.configure(text = "Joueur : "+ nom)
+        zone_nom1.destroy() 
+        l_error.destroy()
+        get_score()
+    except: pass
+
+<<<<<<< HEAD
     joueur.configure(text = "Joueur : " + nom)
     zone_nom.destroy() 
+=======
+>>>>>>> 621e64d7b34b3592810cbcac9b0b2af8b0e653cd
 
 
 def creer_croix(event):
@@ -279,8 +353,17 @@ def creer_croix(event):
     global nb_errors
     global videoplayer
     global mot_non_decouvert
+<<<<<<< HEAD
     global image_to_lettre, mot_non_decouvert
     
+=======
+    global image_to_lettre
+    global nb_pas
+    global l_tentatives
+    global dico_joueurs_gagne
+    nb_pas += 1
+
+>>>>>>> 621e64d7b34b3592810cbcac9b0b2af8b0e653cd
     lettres_images = {'a':1, 'b':2, 'c':3, 'd':4, 'e':5, 'f':6, 'g':7,'h':8, 'i':10, 'j':9, 'k':11, 'l':12,\
                         'm':13, 'n':14, 'o':15, 'p':16, 'q':17, 'r':18, 's':19, 't':20, 'u':21, 'v':22, 'w':23,\
                         'x':24, 'y':25, 'z':26, 'é':0, 'à':27, "è":28, "ê":29, "ë": 30, "î":31, "ï": 32,\
@@ -307,6 +390,7 @@ def creer_croix(event):
 
     if lettre not in MOT and lettre != '0':
         nb_errors += 1
+        l_tentatives.config(text=f'Il te reste {14-nb_errors} tentatives.')
         videoplayer.load(f"../pendu_video/{str(nb_errors)}.mp4") #play the video if lettre not in word
         videoplayer.play()
         if nb_errors == 14:
@@ -331,12 +415,28 @@ def creer_croix(event):
             jeu.geometry("900x600") 
             b_def = tk.Button(jeu, text = f'Definition du mot {MOT}', 
                               command = lambda: create_fenetre_def_eni_root(MOT, 'definition'))
+<<<<<<< HEAD
             b_def.place(x = 400, y = 530)
             gagne_perdu(1)
 
 
 def recommencer(jeu):
     jeu.destroy()
+=======
+            b_def.place(x = 400, y=530)
+            gagne_perdu(1, MOT)
+
+def recommencer():
+    global jeu
+    
+    try:
+        global racine
+        racine.destroy()
+        jeu.destroy()
+    except:
+        jeu.destroy()
+
+>>>>>>> 621e64d7b34b3592810cbcac9b0b2af8b0e653cd
     root_debut_jeu()
       
 
@@ -353,9 +453,15 @@ def root_jeu():
     global MOT
     global mot_non_decouvert
     global image_to_lettre
+    global l_tentatives
+    global dico_joueurs_gagne
+    global nb_pas
 
+    nb_pas = 0
     nb_errors = 0
     mot_non_decouvert = len(MOT)
+    with open('dico_joueurs_gagne.json', 'r') as f:
+        dico_joueurs_gagne = json.load(f)
 
     image_to_lettre = ['0','é', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'j','i', 
                        'k', 'l','m', 'n', 'o', 'p', 'q', 'r', 's','t', 'u', 'v', 'w', 'x', 'y', 'z',
@@ -423,9 +529,9 @@ def root_jeu():
     joueur.place(x = 0, y = 3, anchor = 'nw')
 
     if nom != 'Current':
-        confirm_nom1()
+        confirm_nom(0)
 
-    b_recommencer = tk.Button(jeu, text = 'Recommencer', command = lambda: recommencer(jeu), 
+    b_recommencer = tk.Button(jeu, text = 'Recommencer', command = recommencer, 
                           relief = 'ridge', bg = '#5C5C5C')
     b_recommencer.place(x = 800, y = 20)
 
@@ -433,8 +539,100 @@ def root_jeu():
                           relief = 'ridge', bg = '#5C5C5C')
     b_quitter.place(x = 820, y = 50)
 
+    b_score = tk.Button(jeu, text = 'Score', command = root_score, 
+                          relief = 'ridge', bg = '#5C5C5C')
+    b_score.place(x=825, y=80)
+    
+
+    l_tentatives = tk.Label(jeu, text = f'Il te reste 14 tentatives',font=('Chalkduster',"10"), bg="#C0BCB5", fg="#404040")
+    l_tentatives.place(x = 720, y =260)
+
     jeu.mainloop()
 
+def get_score():
+        
+    global root
+    global nom
+    global dico_joueurs_gagne
+    global l_error
+
+    if nom in list(dico_joueurs_gagne):
+        titre=tk.Label(root, font=('Chalkduster',"30"), text=f"Score de {nom}", bg="#C0BCB5", fg="#404040", pady = 20)
+        titre.pack(side = 'top')
+            
+        l_nb_gains = tk.Label(root,text = f'Vous avez gagne {dico_joueurs_gagne[nom][0]} parties', font=('Chalkduster',"20"),
+                                bg="#C0BCB5", fg="#404040",pady = 10)
+            
+        nb_pas_moyen = 0
+        l_nb_pas = []
+        i = 0
+        while i < 5:
+            try:
+                l_nb_pas.append(tk.Label(root, text=f'mot "{dico_joueurs_gagne[nom][1][i][0]}": {dico_joueurs_gagne[nom][1][i][1]} pas',
+                                font=('Chalkduster',"10"),bg="#C0BCB5", fg="#404040", padx = 40))
+                nb_pas_moyen+= dico_joueurs_gagne[nom][1][i][1]
+                i += 1
+            except: break
+            
+        l_nb_gains.pack(side = 'top')
+
+        try:
+            l_nb_moyen_gains = tk.Label(root,text = f'Votre nombre moyen de tentatives est {int(nb_pas_moyen/i)} ', 
+                                            font=('Chalkduster',"15"),bg="#C0BCB5", fg="#404040", pady = 15)
+            l_nb_moyen_gains.pack(side = 'top')
+        except ZeroDivisionError: pass
+
+        l_text = tk.Label(root,text = f'Vos tentatives:', 
+                            font=('Chalkduster',"15"),bg="#C0BCB5", fg="#404040", pady = 15)
+        l_text.pack(side = 'top')
+
+        for i in range(len(l_nb_pas)):
+            l_nb_pas[i].pack(side = 'top')
+    else:
+            l_error = tk.Label(root, text= 'Vous devez finir au moins une partie pour voir le score')
+            l_error.place(x=150, y=200)
+           
+def root_score():
+    global nom
+    global dico_joueurs_gagne
+    global root
+    global joueur1
+    global zone_nom1
+    global l_error
+    global dico_joueurs_gagne
+
+    root = tk.Tk()
+    root.title('Pendu - Score')
+    root.config(bg ="#C0BCB5")
+    root.geometry("600x400") 
+    root.resizable(width=False, height=False) 
+
+    if dico_joueurs_gagne == None:
+        with open('dico_joueurs_gagne.json', 'r') as f:
+            dico_joueurs_gagne = json.load(f)
+
+    zone_nom1 = tk.Entry(root)
+    zone_nom1.bind("<Return>", confirm_nom1) 
+
+    joueur1 = tk.Label(root, text = "Joueur :") 
+    joueur1.bind("<Button-1>", new_nom1) 
+
+    zone_nom1.place(x=60, y=3, anchor='nw')
+    joueur1.place(x = 0, y =3, anchor='nw')
+
+    if nom == 'Current':
+        l_error = tk.Label(root, text= 'Authentifiez vous avant de voire le score')
+        l_error.place(x=200, y=200)
+    else:
+        confirm_nom1(0)
+        get_score()
+        
+        
+    b_quitter = tk.Button(root, text = 'Quitter', command = lambda: destroy_root(root), 
+                          relief = 'ridge', bg = '#5C5C5C')
+    b_quitter.pack(side='bottom')
+    
+    root.mainloop()
 
 def load_lib_nlp():
     '''download dictionnaire francais de spacy'''
@@ -452,8 +650,8 @@ def load_lib_glove():
     
 def wait_load_lib():
     '''fenetre avec slidebar permettant aux dictionnaires de se telecharger
-    avant aue le jeu commence'''
-    global root
+    avant que le jeu commence'''
+    #global root
     root = tk.Tk()
     root.title('Pendu')
     root.config(bg = "#C0BCB5")
