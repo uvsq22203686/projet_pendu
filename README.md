@@ -28,3 +28,4 @@ Information d'instalation
 - On utilise le spacy lemmanizer , pour cela merci d'installer $ python -m spacy download fr_core_news_md
 
 
+Pour faire ce projet, on a regarde les exemples de codes sur https://pypi.org/project/tkvideoplayer/, https://habr.com/ru/articles/568334/, https://github.com/sammous/spacy-lefff
