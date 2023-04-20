@@ -312,7 +312,6 @@ def get_words_sorted_by_cat(categorie, dict_cat_word, nlp):
 
     translator = Translator()
     categorie1 = translator.translate(categorie, src = 'fr', dest='en').text
-    print(categorie1)
     try:
         for i in range(10):
             try:
@@ -380,7 +379,7 @@ def choix_len():
     try : 
         entry_classe.destroy()
         donner_categorie.destroy()
-    except NameError : pass
+    except: pass
 
     entry_len = tk.Entry(debutjeu)   
     donner_len = tk.Label(debutjeu, text='Longueur ?',font=('Chalkduster',"10"))  
@@ -390,7 +389,6 @@ def choix_len():
 
 def config_len(event):
     '''permet de touver le mot par longueur'''
-    global len_user
     global MOT
     global debutjeu
     global nb_err_dispo
@@ -415,8 +413,7 @@ def choix_classe():
     try : 
         entry_len.destroy()
         donner_len.destroy()
-    except NameError : 
-        None
+    except: pass
     entry_classe = tk.Entry(debutjeu)
     donner_categorie = tk.Label(debutjeu,text="Catégorie ?",font=('Chalkduster',"10"))
     entry_classe.place(x = 390, y = 440)
@@ -554,7 +551,7 @@ def root_debut_jeu():
 
     #création widgets accueil
     play = tk.Canvas(debutjeu, height=250, width=400, bg ="#C0BCB5", bd='0', highlightthickness=0)
-    photo = ImageTk.PhotoImage(Image.open("play1.png")) 
+    photo = ImageTk.PhotoImage(Image.open("./utils/play1.png")) 
     play.create_image(0,0,anchor = 'nw', image=photo)
     titre=tk.Label(debutjeu, font=('Chalkduster',"30"), text="Le jeu du pendu", bg="#5A5A5A", fg="#C0BCB5")
     phrase=tk.Label(debutjeu, font=('Chalkduster',"15"), text="Allez-vous réussir à échapper à la pendaison ?", fg="#404040", bg='#C0BCB5')
@@ -687,7 +684,7 @@ def creer_croix(event):
             num = image_to_lettre1.index(str(lettre1))-1
             #rechercher la lettre dans les images sur le clavier de l'écran 
             lettre = image_to_lettre[lettres_images[lettre1]+1]
-            image_to_lettre[lettres_images[lettre1]] = '0'
+            image_to_lettre[lettres_images[lettre1]+1] = '0'
             # créer la croix qui barre les lettres
             canvas[num].create_line((0,51), (43, 0))
             canvas[num].create_line((0,0), (43, 51))
@@ -701,11 +698,11 @@ def creer_croix(event):
         except AttributeError: pass
         try:
             lettre = image_to_lettre[int(str(event.widget)[8:])]
-            print(lettre)
             image_to_lettre[int(str(event.widget)[8:])] = '0'
         except:
             lettre = image_to_lettre[1]
             image_to_lettre[1] = '0'
+    print(lettre)
     try:
         if lettre not in MOT and lettre != '0':
             nb_errors += 1
@@ -721,7 +718,6 @@ def creer_croix(event):
                 jeu.geometry("900x600") 
                 b_def = tk.Button(jeu, text = f'Definition du mot {MOT}', command = lambda: create_fenetre_def_eni_root(MOT, 'definition'))
                 b_def.place(x = 400, y=530)
-                #jeu.after(2000)
                 gagne_perdu(0, MOT)
 
         elif lettre != '0':
@@ -775,7 +771,7 @@ def root_jeu():
     nb_pas = 0
     nb_errors = 0
     mot_non_decouvert = len(MOT)
-    with open('dico_joueurs_gagne.json', 'r') as f:
+    with open('./utils/dico_joueurs_gagne.json', 'r') as f:
         dico_joueurs_gagne = json.load(f)
 
     image_to_lettre = ['0','é', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'j','i', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's',
@@ -796,7 +792,7 @@ def root_jeu():
     lettre = []
     for i in range(0,38): 
         canvas.append(tk.Canvas(jeu, bg="#C0BCB5",bd ='0',height=48, width = 40))
-        lettre.append(ImageTk.PhotoImage(Image.open('./lettres/%s.png'%i)))
+        lettre.append(ImageTk.PhotoImage(Image.open('./utils/lettres/%s.png'%i)))
         canvas[i].create_image(3,3,anchor = 'nw',image =lettre[i])
         canvas[i].bind('<Button-1>', creer_croix)
 
