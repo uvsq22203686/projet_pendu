@@ -1,5 +1,5 @@
 # Jeu du pendu
-## Groupe: LDDBI Charlene ZETLAOUI, Maryatou KANTE, Daria KURGANSKAYA https://github.com/uvsq22201683/projet_pendu/
+## Groupe 2 LDDBI Charlene ZETLAOUI, Maryatou KANTE, Daria KURGANSKAYA https://github.com/uvsq22201683/projet_pendu/
 ### Joues et vois si tu vas echapper a la pendaison!
 
 ![img de l'app](https://github.com/uvsq22201683/projet_pendu/blob/main/interface/pendu_img.png)
