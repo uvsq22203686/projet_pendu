@@ -936,6 +936,10 @@ def get_score():
     for widget in root.winfo_children():
         if widget != joueur1:
             widget.destroy()
+    
+    b_quitter = tk.Button(root, text = 'Quitter', command = lambda: destroy_root(root), 
+                          relief = 'ridge', bg = '#5C5C5C')
+    b_quitter.pack(side='bottom')
 
     if nom in list(dico_joueurs_gagne):
         titre = tk.Label(root, font = ('Chalkduster',"30"), text = f"Score de {nom}", 
@@ -1018,7 +1022,6 @@ def root_score():
     else:
         confirm_nom1(0)
         get_score()
-        
         
     b_quitter = tk.Button(root, text = 'Quitter', command = lambda: destroy_root(root), 
                           relief = 'ridge', bg = '#5C5C5C')
